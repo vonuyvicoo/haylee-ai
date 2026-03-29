@@ -1,0 +1,173 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../prisma/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  role          Role   @default(FREEMIUM)
+  sessions      Session[]
+  accounts      Account[]
+  plans SubscriptionPlan[]
+  integrations Integration[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+enum Role {
+    FREEMIUM
+    PRO
+    PRO_PLUS
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Integration {
+    id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+    name String 
+    type IntegrationType
+    credential_type CredentialType     
+    access_token String?
+    refresh_token String?
+    expires_at DateTime?
+    apikey String?
+    
+    owner_id String 
+    owner User @relation(fields: [owner_id], references: [id])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@unique([id, owner_id])
+
+    @@map("integration")
+}
+
+enum IntegrationType {
+    META
+}
+
+enum CredentialType {
+    OAUTH
+    APIKEY
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+enum SubscriptionType {
+    WEEKLY
+    MONTHLY
+    FULL_AMOUNT 
+}
+
+enum SubscriptionPlanStatus {
+    ACTIVE
+    INACTIVE
+}
+
+model SubscriptionPlan {
+    id      String   @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+
+    owner_id String 
+    owner User @relation(fields: [owner_id], references: [id])
+
+    stripe_plan_id String @unique
+
+    status SubscriptionPlanStatus
+
+    type SubscriptionType
+    full_amount Int
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    cycles SubscriptionCycle[]
+
+    @@map("subscription_plan")
+}
+
+enum SubscriptionCycleStatus {
+    SUCCEEDED 
+    FAILED 
+    SCHEDULED
+    RETRYING
+}
+
+model SubscriptionCycle {
+    id      String   @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
+
+    plan_id String @db.Uuid
+    plan SubscriptionPlan @relation(fields: [plan_id], references: [id])
+
+    stripe_cycle_id String @unique
+
+    status SubscriptionCycleStatus
+    notes String[] @default([])
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@map("subscription_cycle")
+}
