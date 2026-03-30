@@ -3,6 +3,10 @@ import { AdAccount, AdSet, FacebookAdsApi } from "facebook-nodejs-business-sdk";
 import { GraphEdgeResponse } from "../types";
 import { MetaCredentialService } from "../credentials/credential.service";
 import { FindManyAdSetDto } from "./dto/find-many.dto";
+import { CreateAdSetDto, QueryAdSetDto } from "./dto/create-adset.dto";
+import { UpdateAdSetDto } from "./dto/update-adset.dto";
+import { FindManyTargetingOptionsDto } from "./dto/find-many-target.dto";
+import { Interest } from "./types";
 
 @Injectable()
 export class AdSetService {
@@ -57,5 +61,68 @@ export class AdSetService {
         }
         
     }
+
+    async create(payload: CreateAdSetDto, query: QueryAdSetDto) {
+        const token = await this.creds.getToken();
+        const api = new FacebookAdsApi(token);
+        const adAccount = new AdAccount(query.ad_account_id, {}, null, api);
+        const adset = await adAccount.createAdSet([], {
+            [AdSet.Fields.name]: payload.name,
+            [AdSet.Fields.status]: payload.status ?? AdSet.Status.paused,
+            [AdSet.Fields.campaign_id]: payload.campaign_id,
+            [AdSet.Fields.billing_event]: payload.billing_event,
+            [AdSet.Fields.optimization_goal]: payload.optimization_goal,
+            [AdSet.Fields.targeting]: payload.targeting,
+            ...(payload.promoted_object ? { [AdSet.Fields.promoted_object]: payload.promoted_object } : {}),
+        });
+
+        return adset;
+    }
+
+    async update(id: string, payload: UpdateAdSetDto) {
+        const token = await this.creds.getToken();
+        const api = new FacebookAdsApi(token);
+        const adset = new AdSet(id, {}, null, api);
+        const updated = await adset.update([], {
+            [AdSet.Fields.name]: payload.name,
+            [AdSet.Fields.status]: payload.status,
+            [AdSet.Fields.billing_event]: payload.billing_event,
+            [AdSet.Fields.optimization_goal]: payload.optimization_goal,
+            [AdSet.Fields.targeting]: payload.targeting,
+            ...(payload.promoted_object ? { [AdSet.Fields.promoted_object]: payload.promoted_object } : {}),
+        });
+
+        return updated;
+    }
+
+    async delete(id: string) {
+        const token = await this.creds.getToken();
+        const api = new FacebookAdsApi(token);
+        //const adAccount = new AdAccount(query.ad_account_id, {}, null, api);
+        const adset = new AdSet(id, {}, null, api);
+        await adset.delete([]);
+        return {
+            message: "Deleted successfully."
+        };
+    }
+
+    async searchTargets(query: FindManyTargetingOptionsDto) {
+        const token = await this.creds.getToken();
+        const api = new FacebookAdsApi(token);
+
+        const targets = await api.call<GraphEdgeResponse<Interest>>("GET", ["search"], {
+            ...(query.type ? { type: query.type } : {}),
+            ...(query.class ? { class: query.class } : {}),
+            q: query.query
+        });
+        const paging_cursors: Record<string, string> | null | undefined = targets?.paging;
+
+        return {
+            data: targets.data,
+            paging_cursors
+        }
+
+    }
+
 
 }

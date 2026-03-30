@@ -57,8 +57,8 @@ export class CampaignService {
             [Campaign.Fields.objective]: payload.objective,
             [Campaign.Fields.special_ad_categories]: payload.special_ad_categories,
             [Campaign.Fields.bid_strategy]: payload.bid_strategy,
-            [Campaign.Fields.daily_budget]: payload.daily_budget,
-            [Campaign.Fields.lifetime_budget]: payload.lifetime_budget,
+            ...(payload.daily_budget ? { [Campaign.Fields.daily_budget]: payload.daily_budget } : {}),
+            ...(payload.lifetime_budget ? { [Campaign.Fields.lifetime_budget]: payload.lifetime_budget } : {}),
             ["is_adset_budget_sharing_enabled"]: payload.is_adset_budget_sharing_enabled,
         });
 

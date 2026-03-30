@@ -1,7 +1,15 @@
-import { IsArray, IsBoolean, IsEmpty, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateIf } from "class-validator";
+import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateIf } from "class-validator";
 import { Campaign } from "facebook-nodejs-business-sdk";
 
-export type CampaignObjectiveValue = typeof Campaign.Objective[keyof typeof Campaign.Objective];
+export enum CampaignObjectiveValue {
+    OUTCOME_APP_PROMOTION = "OUTCOME_APP_PROMOTION",
+    OUTCOME_AWARENESS = "OUTCOME_AWARENESS",
+    OUTCOME_ENGAGEMENT = "OUTCOME_ENGAGEMENT",
+    OUTCOME_LEADS = "OUTCOME_LEADS",
+    OUTCOME_SALES = "OUTCOME_SALES",
+    OUTCOME_TRAFFIC = "OUTCOME_TRAFFIC"
+}
+
 export type CampaignStatus = typeof Campaign.Status[keyof typeof Campaign.Status];
 export type CampaignSpecialAdCategory = typeof Campaign.SpecialAdCategories[keyof typeof Campaign.SpecialAdCategories];
 export type CampaignBidStrategy = typeof Campaign.BidStrategy[keyof typeof Campaign.BidStrategy];
@@ -15,7 +23,7 @@ export class CreateCampaignDto {
     @IsString()
     name: string; 
 
-    @IsEnum(Campaign.Objective)
+    @IsEnum(CampaignObjectiveValue)
     objective: CampaignObjectiveValue; 
 
     @IsEnum(Campaign.Status)
@@ -48,7 +56,6 @@ export class CreateCampaignDto {
     @IsArray()
     @IsEnum(Campaign.SpecialAdCategories, { each: true})
     special_ad_categories: CampaignSpecialAdCategory[] = [Campaign.SpecialAdCategories.none];
-    
 
 }
 
