@@ -12,6 +12,7 @@ import { IntegrationModule } from './integrations/integration.module';
 import { AdAccountModule } from './meta/ad-account/adaccount.module';
 import { AdSetModule } from './meta/adset/adset.module';
 import { CampaignModule } from './meta/campaign/campaign.module';
+import { AdModule } from './meta/ads/ads.module';
 
 const ErrorProvider: Provider = {
     provide: APP_FILTER,
@@ -27,7 +28,8 @@ const ErrorProvider: Provider = {
         IntegrationModule,
         AdAccountModule,
         AdSetModule,
-        CampaignModule
+        CampaignModule,
+        AdModule
     ],
   controllers: [AppController],
   providers: [AppService, ErrorProvider],

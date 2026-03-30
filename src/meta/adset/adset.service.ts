@@ -32,6 +32,13 @@ export class AdSetService {
 
         const params = {
             limit: 10,
+            ...(query.campaign_id ? { 
+                filtering: [{
+                    field: "campaign.id",
+                    operator: "IN",
+                    value: [query.campaign_id]
+                }]
+            } : {}),
             ...(query.after ? { after: query.after } : {})
         }
 

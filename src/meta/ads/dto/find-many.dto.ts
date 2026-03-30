@@ -1,13 +1,13 @@
 import { IsOptional, IsString } from "class-validator";
 import { FindManyBaseDto } from "src/meta/dto/find-many-base.dto";
 
-export class FindManyAdSetDto extends FindManyBaseDto {
+export class FindManyAdsDto extends FindManyBaseDto {
     @IsString()
     ad_account_id: string;
 
     @IsString()
     @IsOptional()
-    campaign_id?: string;
+    ad_set_id?: string;
     
     @IsString()
     @IsOptional()

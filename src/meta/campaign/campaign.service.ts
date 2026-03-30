@@ -2,6 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { MetaCredentialService } from "../credentials/credential.service";
 import { AdAccount, Campaign, FacebookAdsApi } from "facebook-nodejs-business-sdk";
 import { FindManyCampaignDto } from "./dto/find-many.dto";
+import { CreateCampaignDto, QueryCampaignDto } from "./dto/create-campaign.dto";
+import { UpdateCampaignDto } from "./dto/update-campaign.dto";
 
 @Injectable()
 export class CampaignService {
@@ -42,5 +44,47 @@ export class CampaignService {
             data,
             paging_cursors
         }
+    }
+
+
+    async create(payload: CreateCampaignDto, query: QueryCampaignDto) {
+        const token = await this.creds.getToken();
+        const api = new FacebookAdsApi(token);
+        const adAccount = new AdAccount(query.ad_account_id, {}, null, api);
+        const campaign = await adAccount.createCampaign([], {
+            [Campaign.Fields.name]: payload.name,
+            [Campaign.Fields.status]: Campaign.Status.paused,
+            [Campaign.Fields.objective]: payload.objective,
+            [Campaign.Fields.special_ad_categories]: payload.special_ad_categories,
+            [Campaign.Fields.bid_strategy]: payload.bid_strategy,
+            [Campaign.Fields.daily_budget]: payload.daily_budget,
+            [Campaign.Fields.lifetime_budget]: payload.lifetime_budget,
+            ["is_adset_budget_sharing_enabled"]: payload.is_adset_budget_sharing_enabled,
+        });
+
+        return campaign;
+    }
+
+    async update(id: string, payload: UpdateCampaignDto) {
+        const token = await this.creds.getToken();
+        const api = new FacebookAdsApi(token);
+        const campaign = new Campaign(id, {}, null, api);
+        const updated = await campaign.update([], {
+            [Campaign.Fields.name]: payload.name,
+            [Campaign.Fields.status]: payload.status,
+            [Campaign.Fields.objective]: payload.objective
+        });
+        return updated;
+    }
+
+    async delete(id: string) {
+        const token = await this.creds.getToken();
+        const api = new FacebookAdsApi(token);
+        //const adAccount = new AdAccount(query.ad_account_id, {}, null, api);
+        const campaign = new Campaign(id, {}, null, api);
+        await campaign.delete([]);
+        return {
+            message: "Deleted successfully."
+        };
     }
 }
