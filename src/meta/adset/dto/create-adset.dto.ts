@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, ValidateIf, ValidateNested } from "class-validator";
+import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, ValidateIf, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 import { AdSet } from "facebook-nodejs-business-sdk";
 import { BudgetStrategy } from "src/meta/campaign/dto/create-campaign.dto";
@@ -47,6 +47,13 @@ export class CreateAdSetDto {
     @IsOptional()
     @IsEnum(AdSet.Status)
     status?: AdSetStatus;
+    
+    @IsDateString()
+    start_time: string;
+    
+    @IsDateString()
+    @IsOptional()
+    end_time: string;
 }
 
 export class QueryAdSetDto {

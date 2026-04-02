@@ -1,0 +1,591 @@
+{
+  "info": {
+    "_postman_id": "haylee-ai-docs-2026-04-02",
+    "name": "Haylee AI",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:3000/api/v1",
+      "type": "default"
+    },
+    {
+      "key": "AD_ACCOUNT_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "CAMPAIGN_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "ADSET_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "AD_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "CREATIVE_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "INTEGRATION_ID",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "USER_ID",
+      "value": "",
+      "type": "default"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Sign Up via Email",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"test12345\",\n  \"name\": \"Von Test\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/sign-up/email",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "sign-up", "email"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign In via Email",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"test12345\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/sign-in/email",
+              "host": ["{{BASE_URL}}"],
+              "path": ["auth", "sign-in", "email"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Current User (me)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/users/me",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users (admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/users",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User (admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/users/{{USER_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users", "{{USER_ID}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User (admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/users/{{USER_ID}}",
+              "host": ["{{BASE_URL}}"],
+              "path": ["users", "{{USER_ID}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Integrations",
+      "item": [
+        {
+          "name": "Request Auth URL",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/integrations/authorize/META",
+              "host": ["{{BASE_URL}}"],
+              "path": ["integrations", "authorize", "META"]
+            },
+            "description": "Returns OAuth authorization URL for the given integration type (e.g. META)."
+          },
+          "response": []
+        },
+        {
+          "name": "OAuth Callback",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/integrations/callback/META?code=REPLACE_WITH_CODE",
+              "host": ["{{BASE_URL}}"],
+              "path": ["integrations", "callback", "META"],
+              "query": [
+                { "key": "code", "value": "REPLACE_WITH_CODE" }
+              ]
+            },
+            "description": "Exchanges auth code for access token. Called by OAuth provider redirect."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Integrations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/integrations",
+              "host": ["{{BASE_URL}}"],
+              "path": ["integrations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Integration Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/integrations/{{INTEGRATION_ID}}/profile",
+              "host": ["{{BASE_URL}}"],
+              "path": ["integrations", "{{INTEGRATION_ID}}", "profile"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Meta",
+      "item": [
+        {
+          "name": "Ad Accounts",
+          "item": [
+            {
+              "name": "Get Ad Accounts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ad-accounts",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ad-accounts"],
+                  "query": [
+                    { "key": "after", "value": "", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Campaigns",
+          "item": [
+            {
+              "name": "Get Campaigns",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/campaigns?ad_account_id={{AD_ACCOUNT_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "campaigns"],
+                  "query": [
+                    { "key": "ad_account_id", "value": "{{AD_ACCOUNT_ID}}" },
+                    { "key": "after", "value": "", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Campaign",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test Campaign\",\n  \"objective\": \"OUTCOME_LEADS\",\n  \"strategy\": \"CAMPAIGN_BUDGET\",\n  \"daily_budget\": 10000,\n  \"bid_strategy\": \"LOWEST_COST_WITHOUT_CAP\",\n  \"special_ad_categories\": [\"NONE\"]\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/campaigns?ad_account_id={{AD_ACCOUNT_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "campaigns"],
+                  "query": [
+                    { "key": "ad_account_id", "value": "{{AD_ACCOUNT_ID}}" }
+                  ]
+                },
+                "description": "objective: OUTCOME_APP_PROMOTION | OUTCOME_AWARENESS | OUTCOME_ENGAGEMENT | OUTCOME_LEADS | OUTCOME_SALES | OUTCOME_TRAFFIC\nstrategy: CAMPAIGN_BUDGET | ADSET_BUDGET\nbid_strategy: LOWEST_COST_WITHOUT_CAP | LOWEST_COST_WITH_BID_CAP | COST_CAP | etc.\ndaily_budget / lifetime_budget: in cents. Required when strategy=CAMPAIGN_BUDGET."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Campaign",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Campaign Name\",\n  \"status\": \"ACTIVE\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/campaigns/{{CAMPAIGN_ID}}?ad_account_id={{AD_ACCOUNT_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "campaigns", "{{CAMPAIGN_ID}}"],
+                  "query": [
+                    { "key": "ad_account_id", "value": "{{AD_ACCOUNT_ID}}" }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Campaign",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/campaigns/{{CAMPAIGN_ID}}?ad_account_id={{AD_ACCOUNT_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "campaigns", "{{CAMPAIGN_ID}}"],
+                  "query": [
+                    { "key": "ad_account_id", "value": "{{AD_ACCOUNT_ID}}" }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Ad Sets",
+          "item": [
+            {
+              "name": "Get Ad Sets",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ad-sets?ad_account_id={{AD_ACCOUNT_ID}}&campaign_id={{CAMPAIGN_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ad-sets"],
+                  "query": [
+                    { "key": "ad_account_id", "value": "{{AD_ACCOUNT_ID}}" },
+                    { "key": "campaign_id", "value": "{{CAMPAIGN_ID}}" },
+                    { "key": "after", "value": "", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Search Interests",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ad-sets/search/interests?type=adinterest&class=interests&query=Insurance",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ad-sets", "search", "interests"],
+                  "query": [
+                    { "key": "type", "value": "adinterest", "description": "adinterest | adTargetingCategory" },
+                    { "key": "class", "value": "interests", "description": "interests | behaviors" },
+                    { "key": "query", "value": "Insurance" }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Ad Set",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"AI Ad Set\",\n  \"campaign_id\": \"{{CAMPAIGN_ID}}\",\n  \"strategy\": \"CAMPAIGN_BUDGET\",\n  \"billing_event\": \"IMPRESSIONS\",\n  \"optimization_goal\": \"PAGE_LIKES\",\n  \"start_time\": \"2026-04-10T00:00:00Z\",\n  \"end_time\": \"2026-05-10T00:00:00Z\",\n  \"targeting\": {\n    \"geo_locations\": {\n      \"countries\": [\"PH\"]\n    },\n    \"targeting_automation\": {\n      \"advantage_audience\": 1\n    },\n    \"flexible_spec\": [\n      {\n        \"interests\": [\n          { \"id\": \"6003353637860\", \"name\": \"Life Insurance\" }\n        ]\n      }\n    ]\n  }\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ad-sets?ad_account_id={{AD_ACCOUNT_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ad-sets"],
+                  "query": [
+                    { "key": "ad_account_id", "value": "{{AD_ACCOUNT_ID}}" }
+                  ]
+                },
+                "description": "strategy: CAMPAIGN_BUDGET | ADSET_BUDGET\ndaily_budget / lifetime_budget: required when strategy=ADSET_BUDGET (in cents)\nbilling_event: IMPRESSIONS | CLICKS | etc.\noptimization_goal: PAGE_LIKES | LEAD_GENERATION | LINK_CLICKS | etc."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Ad Set",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Ad Set\",\n  \"status\": \"ACTIVE\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ad-sets/{{ADSET_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ad-sets", "{{ADSET_ID}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Ad Set",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ad-sets/{{ADSET_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ad-sets", "{{ADSET_ID}}"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Ad Creatives",
+          "item": [
+            {
+              "name": "Get Ad Creatives",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ad-creatives?ad_account_id={{AD_ACCOUNT_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ad-creatives"],
+                  "query": [
+                    { "key": "ad_account_id", "value": "{{AD_ACCOUNT_ID}}" },
+                    { "key": "after", "value": "", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Ad Creative",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test Creative\",\n  \"page_id\": \"REPLACE_WITH_PAGE_ID\",\n  \"message\": \"Check out our offer!\",\n  \"headline\": \"Great Headline\",\n  \"description\": \"Short description here.\",\n  \"link_url\": \"https://example.com\",\n  \"image_hash\": \"REPLACE_WITH_IMAGE_HASH\",\n  \"call_to_action_type\": \"LEARN_MORE\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ad-creatives?ad_account_id={{AD_ACCOUNT_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ad-creatives"],
+                  "query": [
+                    { "key": "ad_account_id", "value": "{{AD_ACCOUNT_ID}}" }
+                  ]
+                },
+                "description": "Use either picture (external URL) or image_hash (from Upload Image).\ncall_to_action_type: LEARN_MORE | SHOP_NOW | SIGN_UP | CONTACT_US | APPLY_NOW | BUY_NOW | GET_QUOTE | SUBSCRIBE | WATCH_MORE | NO_BUTTON | etc."
+              },
+              "response": []
+            },
+            {
+              "name": "Upload Image",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    { "key": "file", "type": "file", "src": "" }
+                  ]
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ad-creatives/images?ad_account_id={{AD_ACCOUNT_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ad-creatives", "images"],
+                  "query": [
+                    { "key": "ad_account_id", "value": "{{AD_ACCOUNT_ID}}" }
+                  ]
+                },
+                "description": "Upload an image (max 10MB). Returns image_hash for use in Create Ad Creative."
+              },
+              "response": []
+            },
+            {
+              "name": "Update Ad Creative",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Creative Name\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ad-creatives/{{CREATIVE_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ad-creatives", "{{CREATIVE_ID}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Ad Creative",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ad-creatives/{{CREATIVE_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ad-creatives", "{{CREATIVE_ID}}"]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Ads",
+          "item": [
+            {
+              "name": "Get Ads",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ads?ad_account_id={{AD_ACCOUNT_ID}}&ad_set_id={{ADSET_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ads"],
+                  "query": [
+                    { "key": "ad_account_id", "value": "{{AD_ACCOUNT_ID}}" },
+                    { "key": "ad_set_id", "value": "{{ADSET_ID}}", "description": "optional" },
+                    { "key": "after", "value": "", "disabled": true }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Create Ad",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test Ad\",\n  \"adset_id\": \"{{ADSET_ID}}\",\n  \"creative_id\": \"{{CREATIVE_ID}}\",\n  \"status\": \"PAUSED\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ads?ad_account_id={{AD_ACCOUNT_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ads"],
+                  "query": [
+                    { "key": "ad_account_id", "value": "{{AD_ACCOUNT_ID}}" }
+                  ]
+                },
+                "description": "status: ACTIVE | PAUSED (optional, defaults per SDK)"
+              },
+              "response": []
+            },
+            {
+              "name": "Update Ad",
+              "request": {
+                "method": "PATCH",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Ad Name\",\n  \"status\": \"ACTIVE\"\n}",
+                  "options": { "raw": { "language": "json" } }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ads/{{AD_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ads", "{{AD_ID}}"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Ad",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/meta/ads/{{AD_ID}}",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["meta", "ads", "{{AD_ID}}"]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -73,6 +73,8 @@ export class AdSetService {
             [AdSet.Fields.billing_event]: payload.billing_event,
             [AdSet.Fields.optimization_goal]: payload.optimization_goal,
             [AdSet.Fields.targeting]: payload.targeting,
+            [AdSet.Fields.start_time]: payload.start_time,
+            [AdSet.Fields.end_time]: payload.end_time,
             ...(payload.promoted_object ? { [AdSet.Fields.promoted_object]: payload.promoted_object } : {}),
         });
 
@@ -89,6 +91,8 @@ export class AdSetService {
             [AdSet.Fields.billing_event]: payload.billing_event,
             [AdSet.Fields.optimization_goal]: payload.optimization_goal,
             [AdSet.Fields.targeting]: payload.targeting,
+            [AdSet.Fields.start_time]: payload.start_time,
+            [AdSet.Fields.end_time]: payload.end_time,
             ...(payload.promoted_object ? { [AdSet.Fields.promoted_object]: payload.promoted_object } : {}),
         });
 
