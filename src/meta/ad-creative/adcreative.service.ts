@@ -72,7 +72,7 @@ export class AdCreativeService {
                 ...(payload.call_to_action_type ? {
                     call_to_action: {
                         type: payload.call_to_action_type,
-                        value: { link: payload.link_url, link_format: "WEBSITE_LINK" },
+                        value: { link: payload.link_url },
                     }
                 } : {}),
             };
@@ -87,7 +87,7 @@ export class AdCreativeService {
                 ...(payload.call_to_action_type ? {
                     call_to_action: {
                         type: payload.call_to_action_type,
-                        value: { link: payload.link_url, link_format: "WEBSITE_LINK" },
+                        value: { link: payload.link_url },
                     }
                 } : {}),
             };

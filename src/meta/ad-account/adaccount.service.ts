@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { FacebookAdsApi, } from "facebook-nodejs-business-sdk";
+import { AdAccount, FacebookAdsApi, } from "facebook-nodejs-business-sdk";
 import { AdAccountBase, GraphEdgeResponse } from "../types";
 import { FindManyAdAccountDto } from "./dto/find-many.dto";
 import { MetaCredentialService } from "../credentials/credential.service";
@@ -15,7 +15,11 @@ export class AdAccountService {
 
         const api = new FacebookAdsApi(token);
         const adaccounts = await api.call<GraphEdgeResponse<AdAccountBase>>('GET', ['me', 'adaccounts'], {
-            fields: 'id,name',
+            fields: [
+                AdAccount.Fields.id,
+                AdAccount.Fields.name,
+                AdAccount.Fields.currency
+            ].join(","),
             ...(query.after ? { after: query.after } : {}),
             limit: 10
         });

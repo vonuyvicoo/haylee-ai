@@ -13,6 +13,7 @@ export enum CampaignObjectiveValue {
 export type CampaignStatus = typeof Campaign.Status[keyof typeof Campaign.Status];
 export type CampaignSpecialAdCategory = typeof Campaign.SpecialAdCategories[keyof typeof Campaign.SpecialAdCategories];
 export type CampaignBidStrategy = typeof Campaign.BidStrategy[keyof typeof Campaign.BidStrategy];
+export type CampaignEffectiveStatus = typeof Campaign.EffectiveStatus[keyof typeof Campaign.EffectiveStatus];
 
 export enum BudgetStrategy {
     CAMPAIGN_BUDGET = "CAMPAIGN_BUDGET",

@@ -23,7 +23,7 @@ export class CampaignService {
             Campaign.Fields.daily_budget,
             Campaign.Fields.lifetime_budget,
             Campaign.Fields.start_time,
-            Campaign.Fields.stop_time
+            Campaign.Fields.stop_time,
         ];
 
         const params = {
