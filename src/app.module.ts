@@ -14,6 +14,7 @@ import { AdSetModule } from './meta/adset/adset.module';
 import { CampaignModule } from './meta/campaign/campaign.module';
 import { AdModule } from './meta/ads/ads.module';
 import { AdCreativeModule } from './meta/ad-creative/adcreative.module';
+import { MessageModule } from './message/message.module';
 
 const ErrorProvider: Provider = {
     provide: APP_FILTER,
@@ -31,7 +32,8 @@ const ErrorProvider: Provider = {
         AdSetModule,
         CampaignModule,
         AdModule,
-        AdCreativeModule
+        AdCreativeModule,
+        MessageModule
     ],
   controllers: [AppController],
   providers: [AppService, ErrorProvider],

@@ -13,6 +13,7 @@ export class CampaignService {
 
     async findMany(query: FindManyCampaignDto) {
         const token = await this.creds.getToken();
+        console.log(token);
         const api = new FacebookAdsApi(token);
         const adAccount = new AdAccount(query.ad_account_id, {}, null, api);
         const fields = [
