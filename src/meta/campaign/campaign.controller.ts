@@ -3,6 +3,7 @@ import { CampaignService } from "./campaign.service";
 import { FindManyCampaignDto } from "./dto/find-many.dto";
 import { CreateCampaignDto } from "./dto/create-campaign.dto";
 import { UpdateCampaignDto } from "./dto/update-campaign.dto";
+import { Session, UserSession } from "@thallesp/nestjs-better-auth";
 
 @Controller('meta/campaigns')
 export class CampaignController {
@@ -12,35 +13,39 @@ export class CampaignController {
     
     @Get()
     async findMany(
-        @Query() query: FindManyCampaignDto
+        @Query() query: FindManyCampaignDto,
+        @Session() session: UserSession
     ) {
-        const campaigns = await this.campaignService.findMany(query);
+        const campaigns = await this.campaignService.findMany(query, session);
         return campaigns;
     }
 
     @Post()
     async create(
         @Query() query: FindManyCampaignDto,
-        @Body() payload: CreateCampaignDto
+        @Body() payload: CreateCampaignDto,
+        @Session() session: UserSession
     ) {
-        const campaign = await this.campaignService.create(payload, query);
+        const campaign = await this.campaignService.create(payload, query, session);
         return campaign;
     }
 
     @Patch(":campaign_id")
     async update(
         @Param("campaign_id") campaign_id: string,
-        @Body() payload: UpdateCampaignDto
+        @Body() payload: UpdateCampaignDto,
+        @Session() session: UserSession
     ) {
-        const campaign = await this.campaignService.update(campaign_id, payload);
+        const campaign = await this.campaignService.update(campaign_id, payload, session);
         return campaign;
     }
 
     @Delete(":campaign_id")
     async delete(
         @Param("campaign_id") campaign_id: string,
+        @Session() session: UserSession
     ) {
-        const msg = await this.campaignService.delete(campaign_id);
+        const msg = await this.campaignService.delete(campaign_id, session);
         return msg;
     }
 }

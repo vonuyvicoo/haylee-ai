@@ -1,26 +1,22 @@
-import { Inject, Injectable, Scope, UnauthorizedException } from "@nestjs/common";
-import { REQUEST } from "@nestjs/core";
-import { Request } from "express";
-import { MetaRequestContext } from "../interceptors/meta.context";
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { IntegrationService } from "src/integrations/integration.service";
 import { EncryptionService } from "src/encryption/encryption.service";
 import { IntegrationType } from "prisma/generated/prisma";
 import { UserSession } from "@thallesp/nestjs-better-auth";
+import { Request } from "express";
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class MetaCredentialService {
     constructor(
-        @Inject(REQUEST) private readonly req: Request,
-        private readonly ctx: MetaRequestContext,
         private readonly integrationService: IntegrationService,
         private readonly encryptionService: EncryptionService
     ) {}
 
-    async getToken() {
-        const session: UserSession = (this.req as any).session;
+    async getToken(session: UserSession, req?: Request) {
         if(!session) throw new UnauthorizedException("No session found.");
 
-        const integration_id = this.ctx.integrationId;
+        const integration_id = req?.query?.integrationId;
+        if(integration_id && typeof integration_id !== 'string') throw new BadRequestException("Invalid integration_id.");
 
         const credential = await this.integrationService._findOne(
             IntegrationType.META,

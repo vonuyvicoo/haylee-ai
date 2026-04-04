@@ -5,6 +5,7 @@ import { IHistoryPayload, IRole } from '../message/dto/create-message.dto';
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { LLMFactory } from './factory/llm.factory';
 import { HayleeToolFactory } from './tools/factory';
+import { UserSession } from '@thallesp/nestjs-better-auth';
 
 export const BANNED_WORDS = [
     "<script",
@@ -86,7 +87,7 @@ export class LlmService implements OnModuleInit {
         });
     }
 
-    async *invoke(messages: IHistoryPayload[]) {
+    async *invoke(messages: IHistoryPayload[], session: UserSession) {
         const controller = new AbortController();
         try {
             await this.initialize();
@@ -101,10 +102,9 @@ export class LlmService implements OnModuleInit {
                     signal: controller.signal,
                     streamMode: ["messages", "custom", "updates", "tools"], 
                     recursionLimit: 50,
-                    /*
                     configurable: {
-                        session_token
-                    }*/
+                        session
+                    }
                 }
             )) {
                 if(mode === 'updates') {

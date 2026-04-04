@@ -7,7 +7,6 @@ export class VerifyWebhookGuard implements CanActivate {
 
         const token = request.query["hub.verify_token"];
         
-        console.log(token);
         if(token == process.env.META_WEBHOOK_TOKEN){
             return true;
         }

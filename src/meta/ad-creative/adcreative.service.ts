@@ -5,6 +5,7 @@ import axios from "axios";
 import { MetaCredentialService } from "../credentials/credential.service";
 import { CreateAdCreativeDto, QueryAdCreativeDto } from "./dto/create-adcreative.dto";
 import { UpdateAdCreativeDto } from "./dto/update-adcreative.dto";
+import { UserSession } from "@thallesp/nestjs-better-auth";
 
 const META_API_VERSION = "v23.0";
 
@@ -12,8 +13,8 @@ const META_API_VERSION = "v23.0";
 export class AdCreativeService {
     constructor(private readonly creds: MetaCredentialService) {}
 
-    async findMany(query: QueryAdCreativeDto) {
-        const token = await this.creds.getToken();
+    async findMany(query: QueryAdCreativeDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
         const adAccount = new AdAccount(query.ad_account_id, {}, null, api);
 
@@ -48,7 +49,7 @@ export class AdCreativeService {
         return { data, paging_cursors };
     }
 
-    async create(payload: CreateAdCreativeDto, query: QueryAdCreativeDto) {
+    async create(payload: CreateAdCreativeDto, query: QueryAdCreativeDto, session: UserSession) {
         if (payload.picture && payload.image_hash) {
             throw new BadRequestException("Cannot use both picture and image_hash. Choose one.");
         }
@@ -56,7 +57,7 @@ export class AdCreativeService {
             throw new BadRequestException("Either picture, image_hash, or video_id must be provided.");
         }
 
-        const token = await this.creds.getToken();
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
         const adAccount = new AdAccount(query.ad_account_id, {}, null, api);
 
@@ -105,8 +106,8 @@ export class AdCreativeService {
         return creative;
     }
 
-    async update(id: string, payload: UpdateAdCreativeDto) {
-        const token = await this.creds.getToken();
+    async update(id: string, payload: UpdateAdCreativeDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
         const creative = new AdCreative(id, {}, null, api);
         const updated = await creative.update([], {
@@ -116,16 +117,16 @@ export class AdCreativeService {
         return updated;
     }
 
-    async delete(id: string) {
-        const token = await this.creds.getToken();
+    async delete(id: string, session: UserSession) {
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
         const creative = new AdCreative(id, {}, null, api);
         await creative.delete([]);
         return { message: "Deleted successfully." };
     }
 
-    async uploadImage(ad_account_id: string, file: Express.Multer.File) {
-        const token = await this.creds.getToken();
+    async uploadImage(ad_account_id: string, file: Express.Multer.File, session: UserSession) {
+        const token = await this.creds.getToken(session);
 
         const form = new FormData();
         form.append("filename", file.buffer, {

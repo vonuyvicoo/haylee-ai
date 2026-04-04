@@ -3,6 +3,7 @@ import { MetaCredentialService } from "../credentials/credential.service";
 import { FindManyAdsDto } from "./dto/find-many.dto";
 import { Ad, AdAccount, FacebookAdsApi } from "facebook-nodejs-business-sdk";
 import { CreateAdDto, QueryAdDto, UpdateAdDto } from "./dto/create-ad.dto";
+import { UserSession } from "@thallesp/nestjs-better-auth";
 
 @Injectable()
 export class AdService {
@@ -10,8 +11,8 @@ export class AdService {
         private readonly creds: MetaCredentialService
     ) {}
 
-    async findMany(query: FindManyAdsDto) {
-        const token = await this.creds.getToken();
+    async findMany(query: FindManyAdsDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
 
         const adaccount = new AdAccount(query.ad_account_id, {}, null, api);
@@ -50,8 +51,8 @@ export class AdService {
         return { data, paging_cursors };
     }
 
-    async create(payload: CreateAdDto, query: QueryAdDto) {
-        const token = await this.creds.getToken();
+    async create(payload: CreateAdDto, query: QueryAdDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
         const adAccount = new AdAccount(query.ad_account_id, {}, null, api);
         const ad = await adAccount.createAd([], {
@@ -64,8 +65,8 @@ export class AdService {
         return ad;
     }
 
-    async update(id: string, payload: UpdateAdDto) {
-        const token = await this.creds.getToken();
+    async update(id: string, payload: UpdateAdDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
         const ad = new Ad(id, {}, null, api);
         const updated = await ad.update([], {
@@ -75,8 +76,8 @@ export class AdService {
         return updated;
     }
 
-    async delete(id: string) {
-        const token = await this.creds.getToken();
+    async delete(id: string, session: UserSession) {
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
         const ad = new Ad(id, {}, null, api);
         await ad.delete([]);

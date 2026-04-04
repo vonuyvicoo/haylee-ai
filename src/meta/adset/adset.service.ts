@@ -7,6 +7,7 @@ import { CreateAdSetDto, QueryAdSetDto } from "./dto/create-adset.dto";
 import { UpdateAdSetDto } from "./dto/update-adset.dto";
 import { FindManyTargetingOptionsDto } from "./dto/find-many-target.dto";
 import { Interest } from "./types";
+import { UserSession } from "@thallesp/nestjs-better-auth";
 
 @Injectable()
 export class AdSetService {
@@ -16,9 +17,10 @@ export class AdSetService {
     ) {}
        
     async findMany(
-        query: FindManyAdSetDto
+        query: FindManyAdSetDto,
+        session: UserSession
     ) {
-        const token = await this.creds.getToken();
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
 
         const adaccount = new AdAccount(query.ad_account_id, {}, null, api);
@@ -62,8 +64,8 @@ export class AdSetService {
         
     }
 
-    async create(payload: CreateAdSetDto, query: QueryAdSetDto) {
-        const token = await this.creds.getToken();
+    async create(payload: CreateAdSetDto, query: QueryAdSetDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
         const adAccount = new AdAccount(query.ad_account_id, {}, null, api);
         const adset = await adAccount.createAdSet([], {
@@ -81,8 +83,8 @@ export class AdSetService {
         return adset;
     }
 
-    async update(id: string, payload: UpdateAdSetDto) {
-        const token = await this.creds.getToken();
+    async update(id: string, payload: UpdateAdSetDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
         const adset = new AdSet(id, {}, null, api);
         const updated = await adset.update([], {
@@ -99,8 +101,8 @@ export class AdSetService {
         return updated;
     }
 
-    async delete(id: string) {
-        const token = await this.creds.getToken();
+    async delete(id: string, session: UserSession) {
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
         //const adAccount = new AdAccount(query.ad_account_id, {}, null, api);
         const adset = new AdSet(id, {}, null, api);
@@ -110,8 +112,8 @@ export class AdSetService {
         };
     }
 
-    async searchTargets(query: FindManyTargetingOptionsDto) {
-        const token = await this.creds.getToken();
+    async searchTargets(query: FindManyTargetingOptionsDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
         const api = new FacebookAdsApi(token);
 
         const targets = await api.call<GraphEdgeResponse<Interest>>("GET", ["search"], {

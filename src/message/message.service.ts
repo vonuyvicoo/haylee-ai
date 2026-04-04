@@ -4,6 +4,7 @@ import { LlmService } from '../llm/llm.service';
 import { CreateMessageDto, IHistoryPayload, IRole, } from './dto/create-message.dto';
 import { StreamEvent } from './interfaces/stream-response.interface';
 import { StreamerFactory } from './factory/streamer.factory';
+import { UserSession } from '@thallesp/nestjs-better-auth';
 
 @Injectable()
 export class MessageService {
@@ -32,8 +33,8 @@ export class MessageService {
         return message_payload;
     };
 
-    async graphInvoke(payload: CreateMessageDto, subscriber: Subscriber<StreamEvent>) {
-        for await (const event of this.llmService.invoke(this.buildHistory(payload))) {
+    async graphInvoke(payload: CreateMessageDto, subscriber: Subscriber<StreamEvent>, session: UserSession) {
+        for await (const event of this.llmService.invoke(this.buildHistory(payload), session)) {
             //langgraph mode
             const strategy = this.streamerFactory.create(event as any);
             strategy?.emit(event as any, subscriber);

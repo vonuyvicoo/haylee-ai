@@ -3,6 +3,7 @@ import { HayleeTool } from "../base";
 import { CampaignService } from "src/meta/campaign/campaign.service";
 import { FindManyCampaignDto } from "src/meta/campaign/dto/find-many.dto";
 import { FindManyCampaignDtoSchema } from "src/generated/schemas/find-many.dto.schema";
+import { RunnableConfig } from "@langchain/core/runnables";
 
 export class FindManyCampaignsTool extends HayleeTool {
     constructor(private metaCampaignService: CampaignService){
@@ -11,8 +12,8 @@ export class FindManyCampaignsTool extends HayleeTool {
     getStructuredTool(): StructuredTool {
         
         return tool(
-            async (params: FindManyCampaignDto) => {
-                const result = await this.metaCampaignService.findMany(params);
+            async (params: FindManyCampaignDto, config: RunnableConfig) => {
+                const result = await this.metaCampaignService.findMany(params, config.configurable?.session);
                 return JSON.stringify(result);
             },
             {

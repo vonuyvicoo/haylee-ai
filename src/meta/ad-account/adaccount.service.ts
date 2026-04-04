@@ -3,6 +3,7 @@ import { AdAccount, FacebookAdsApi, } from "facebook-nodejs-business-sdk";
 import { AdAccountBase, GraphEdgeResponse } from "../types";
 import { FindManyAdAccountDto } from "./dto/find-many.dto";
 import { MetaCredentialService } from "../credentials/credential.service";
+import { UserSession } from "@thallesp/nestjs-better-auth";
 
 @Injectable()
 export class AdAccountService {
@@ -10,8 +11,8 @@ export class AdAccountService {
         private readonly creds: MetaCredentialService
     ) {}
 
-    async findMany(query: FindManyAdAccountDto) {
-        const token = await this.creds.getToken();
+    async findMany(query: FindManyAdAccountDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
 
         const api = new FacebookAdsApi(token);
         const adaccounts = await api.call<GraphEdgeResponse<AdAccountBase>>('GET', ['me', 'adaccounts'], {
