@@ -2,7 +2,7 @@ import { Subscriber } from "rxjs";
 import { EventKind, LlmTokenChunk, LlmTokenPayload, StreamEvent } from "../interfaces/stream-response.interface";
 import { IStreamer } from "../interfaces/streamer.interface";
 
-const NODE_WHITELIST = ["basicLLMCall", "digestLLMCall", "legalAnalysisLLMCall", "model_request"];
+const NODE_WHITELIST = ["model_request"];
 
 export class LlmTokenStreamer implements IStreamer {
     emit(event: LlmTokenChunk, subscriber: Subscriber<StreamEvent>): void {

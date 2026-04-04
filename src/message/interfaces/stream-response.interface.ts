@@ -9,8 +9,6 @@ export interface IAIMessageEvent {
 export enum EventKind {
     LLM_TOKEN = "llm_token",
     REASONING_TOKEN = "reasoning_token",
-    SEARCH_UPDATE = "search_update",
-    DRAFT_TOKEN = "draft_token",
     TOOLS = "tools",
     ERROR = "error",
     LOG_INFO = "log_info",
@@ -35,18 +33,6 @@ interface LlmContent {
     text: string;
 }
 
-interface DraftContent extends LlmContent {};
-
-export interface DraftTokenPayload extends BaseEventPayload {
-    _schema?: CustomSchema.TOOL_DRAFT,
-    kind: EventKind.DRAFT_TOKEN;
-    content: DraftContent[];
-    model: string;
-    is_tool_output: boolean;
-}
-
-
-
 export interface ReasoningTokenPayload extends BaseEventPayload {
     kind: EventKind.REASONING_TOKEN;
     content: ReasoningContent[];
@@ -70,31 +56,11 @@ export enum ToolStatus {
     ERROR = "ERROR"
 }
 
-export interface SearchPayload extends BaseEventPayload {
-    kind: EventKind.SEARCH_UPDATE;
-    content: SearchContent;
-    search_call_id: string;
-    status: SearchStatus;
-    results: MinimalSearchResultContent[];
-}
-
 export interface LogInfoPayload extends BaseEventPayload {
     kind: EventKind.LOG_INFO;
     content: LogInfoContent;
 }
 export type LogInfoContent = Record<string, any>;
-
-interface SearchContent {
-    query: string;
-    search_type: WorkerType;
-}
-
-interface MinimalSearchResultContent {
-    title: string;
-    original_identifier_number: string;
-    chunk_id: string;
-    slug: string;
-}
 
 export interface ToolPayload extends BaseEventPayload {
     kind: EventKind.TOOLS;
@@ -124,8 +90,6 @@ export type StreamEvent =
 | MessageEvent<LlmTokenPayload>
 | MessageEvent<ErrorPayload>
 | MessageEvent<ReasoningTokenPayload>
-| MessageEvent<SearchPayload>
-| MessageEvent<DraftTokenPayload>
 | MessageEvent<ToolPayload>
 | MessageEvent<LogInfoPayload>
 
@@ -140,10 +104,3 @@ export type GraphStreamChunk =
 | ["custom", Record<string, any>]
 | ["tools", Record<string, any>]
 
-
-
-export enum CustomSchema {
-    SEARCH = "SearchSchema",
-    LOG_INFO = "LogInfoSchema",
-    TOOL_DRAFT = "ToolDraftSchema"
-}

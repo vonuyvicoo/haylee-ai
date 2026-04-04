@@ -27,6 +27,7 @@ model User {
   accounts      Account[]
   plans SubscriptionPlan[]
   integrations Integration[]
+  files File[]
 
   @@unique([email])
   @@map("user")
@@ -85,7 +86,7 @@ model Integration {
     apikey String?
     
     owner_id String 
-    owner User @relation(fields: [owner_id], references: [id])
+    owner User @relation(fields: [owner_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
     created_at DateTime @default(now())
     updated_at DateTime @updatedAt
@@ -131,7 +132,7 @@ model SubscriptionPlan {
     id      String   @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
 
     owner_id String 
-    owner User @relation(fields: [owner_id], references: [id])
+    owner User @relation(fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
     stripe_plan_id String @unique
 
@@ -159,7 +160,7 @@ model SubscriptionCycle {
     id      String   @db.Uuid @default(dbgenerated("gen_random_uuid()")) @id
 
     plan_id String @db.Uuid
-    plan SubscriptionPlan @relation(fields: [plan_id], references: [id])
+    plan SubscriptionPlan @relation(fields: [plan_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
 
     stripe_cycle_id String @unique
 
@@ -171,3 +172,20 @@ model SubscriptionCycle {
 
     @@map("subscription_cycle")
 }
+
+
+model File {
+    id String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+    title String
+    type String
+    internal_path String
+    file_name String
+    owner_id String
+    owner User @relation(fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: Cascade)    
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+    @@map("file")
+}
+
+

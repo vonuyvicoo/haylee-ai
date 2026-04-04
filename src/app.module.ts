@@ -15,6 +15,8 @@ import { CampaignModule } from './meta/campaign/campaign.module';
 import { AdModule } from './meta/ads/ads.module';
 import { AdCreativeModule } from './meta/ad-creative/adcreative.module';
 import { MessageModule } from './message/message.module';
+import { ImageGeneratorModule } from './image-generator/image-generator.module';
+import { FilesModule } from './files/files.module';
 
 const ErrorProvider: Provider = {
     provide: APP_FILTER,
@@ -33,7 +35,9 @@ const ErrorProvider: Provider = {
         CampaignModule,
         AdModule,
         AdCreativeModule,
-        MessageModule
+        MessageModule,
+        ImageGeneratorModule,
+        FilesModule
     ],
   controllers: [AppController],
   providers: [AppService, ErrorProvider],

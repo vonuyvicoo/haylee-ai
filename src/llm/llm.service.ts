@@ -40,6 +40,9 @@ export class LlmService implements OnModuleInit {
     private createDirectTools() {
         const tools = this.hayleeToolFactory.getTools();
         return Object.keys(tools).map((key) => {
+            if(key === 'create_adcreative') {
+                return tools[key].getStructuredTool(this.model);
+            }
             return tools[key].getStructuredTool();
         })
     }
@@ -72,7 +75,6 @@ export class LlmService implements OnModuleInit {
             });
             this.isInitialized = true;
         }
-        this.logger.log("LLM SERVICE REINITIALIZED")
     }
 
     private convertToLangChainMessages(history: IHistoryPayload[]) {
@@ -91,7 +93,6 @@ export class LlmService implements OnModuleInit {
         const controller = new AbortController();
         try {
             await this.initialize();
-            this.logger.log("LLM SERVICE REINITIALIZED")
             const langchainMessages = this.convertToLangChainMessages(messages);
 
             for await (const [mode, chunk] of await this.agent.stream(
