@@ -10,10 +10,39 @@ export enum CampaignObjectiveValue {
     OUTCOME_TRAFFIC = "OUTCOME_TRAFFIC"
 }
 
-export type CampaignStatus = typeof Campaign.Status[keyof typeof Campaign.Status];
-export type CampaignSpecialAdCategory = typeof Campaign.SpecialAdCategories[keyof typeof Campaign.SpecialAdCategories];
-export type CampaignBidStrategy = typeof Campaign.BidStrategy[keyof typeof Campaign.BidStrategy];
-export type CampaignEffectiveStatus = typeof Campaign.EffectiveStatus[keyof typeof Campaign.EffectiveStatus];
+export enum CampaignStatus {
+    PAUSED = 'PAUSED',
+    ACTIVE = 'ACTIVE',
+    DELETED = 'DELETED',
+    ARCHIVED = 'ARCHIVED'
+}
+
+
+export enum CampaignSpecialAdCategory {
+    NONE = "NONE",
+    CREDIT = "CREDIT",
+    HOUSING = "HOUSING",
+    EMPLOYMENT = "EMPLOYMENT",
+    ISSUES_ELECTIONS_POLITICS = "ISSUES_ELECTIONS_POLITICS",
+    ONLINE_GAMBLING_AND_GAMING = "ONLINE_GAMBLING_AND_GAMING",
+    FINANCIAL_PRODUCTS_SERVICES = "FINANCIAL_PRODUCTS_SERVICES"
+}
+
+export enum CampaignBidStrategy {
+    COST_CAP = "COST_CAP",
+    LOWEST_COST_WITHOUT_CAP = "LOWEST_COST_WITHOUT_CAP",
+    LOWEST_COST_WITH_BID_CAP = "LOWEST_COST_WITH_BID_CAP",
+    LOWEST_COST_WITH_MIN_ROAS = "LOWEST_COST_WITH_MIN_ROAS"
+}
+
+export enum CampaignEffectiveStatus {
+    PAUSED = "PAUSED",
+    ACTIVE = "ACTIVE",
+    DELETED = "DELETED",
+    ARCHIVED = "ARCHIVED",
+    IN_PROCESS = "IN_PROCESS",
+    WITH_ISSUES = "WITH_ISSUES"
+}
 
 export enum BudgetStrategy {
     CAMPAIGN_BUDGET = "CAMPAIGN_BUDGET",
@@ -29,7 +58,7 @@ export class CreateCampaignDto {
 
     @IsEnum(Campaign.Status)
     @IsOptional()
-    status: CampaignStatus = 'PAUSED';
+    status: CampaignStatus = CampaignStatus.PAUSED;
 
     @IsEnum(BudgetStrategy)
     strategy: BudgetStrategy;
@@ -55,8 +84,8 @@ export class CreateCampaignDto {
 
     @IsOptional()
     @IsArray()
-    @IsEnum(Campaign.SpecialAdCategories, { each: true})
-    special_ad_categories: CampaignSpecialAdCategory[] = [Campaign.SpecialAdCategories.none];
+    @IsEnum(CampaignSpecialAdCategory, { each: true})
+    special_ad_categories: CampaignSpecialAdCategory[] = [CampaignSpecialAdCategory.NONE]
 
 }
 
