@@ -5,25 +5,42 @@ import { HayleeToolFactory } from './tools/factory';
 import { CampaignService } from 'src/meta/campaign/campaign.service';
 import { FindManyCampaignsTool } from './tools/implementation';
 import { CampaignModule } from 'src/meta/campaign/campaign.module';
-import { CreateAdCreativeTool } from './tools/implementation/create-adcreative.impl';
 import { ImageGeneratorService } from 'src/image-generator/image-generator.service';
 import { ImageGeneratorModule } from 'src/image-generator/image-generator.module';
 import { FilesService } from 'src/files/files.service';
 import { FilesModule } from 'src/files/files.module';
+import { CreateImageTool } from './tools/implementation/create-image.impl';
+import { CreateCampaignTool } from './tools/implementation/create-campaign.impl';
+import { CreateAdSetTool } from './tools/implementation/create-adset.impl';
+import { CreateAdTool } from './tools/implementation/create-ad.impl';
+import { CreateAdCreativeTool } from './tools/implementation/create-adcreative.impl';
+import { AdSetService } from 'src/meta/adset/adset.service';
+import { AdCreativeService } from 'src/meta/ad-creative/adcreative.service';
+import { AdService } from 'src/meta/ads/ads.service';
+import { AdSetModule } from 'src/meta/adset/adset.module';
+import { AdModule } from 'src/meta/ads/ads.module';
+import { AdCreativeModule } from 'src/meta/ad-creative/adcreative.module';
 
 const HayleeToolProvider: Provider = {
     provide: HayleeToolFactory,
     useFactory: (
         metaCampaignService: CampaignService,
         imgGenService: ImageGeneratorService,
-        fileService: FilesService
+        fileService: FilesService,
+        adSetService: AdSetService,
+        adCreativeService: AdCreativeService,
+        adService: AdService
     ) => {
         const factory = new HayleeToolFactory();
         factory.register("find_many_campaigns", new FindManyCampaignsTool(metaCampaignService));
-        factory.register("create_adcreative", new CreateAdCreativeTool(imgGenService, fileService))
+        factory.register("create_image", new CreateImageTool(imgGenService, fileService));
+        factory.register("create_campaign", new CreateCampaignTool(metaCampaignService));
+        factory.register("create_adset", new CreateAdSetTool(adSetService));
+        factory.register("create_ad", new CreateAdTool(adService));
+        factory.register("create_adcreative", new CreateAdCreativeTool(adCreativeService));
         return factory;
     },
-    inject: [CampaignService, ImageGeneratorService, FilesService]
+    inject: [CampaignService, ImageGeneratorService, FilesService, AdSetService, AdCreativeService, AdService]
 }
 
 export const LLMProvider: Provider = {
@@ -37,7 +54,7 @@ export const LLMProvider: Provider = {
 // img gen module at app root 
 
 @Module({
-    imports: [CampaignModule, FilesModule, ImageGeneratorModule],
+    imports: [CampaignModule, AdSetModule, AdModule, AdCreativeModule, FilesModule, ImageGeneratorModule],
     providers: [
         LlmService, 
         LLMFactory, 

@@ -1,7 +1,11 @@
 import { IsEnum, IsOptional, IsString } from "class-validator";
-import { Ad } from "facebook-nodejs-business-sdk";
 
-export type AdStatus = typeof Ad.Status[keyof typeof Ad.Status];
+export enum AdStatus {
+    ACTIVE = "ACTIVE",
+    PAUSED = "PAUSED",
+    DELETED = "DELETED",
+    ARCHIVED = "ARCHIVED"
+}
 
 export class CreateAdDto {
     @IsString()
@@ -13,7 +17,7 @@ export class CreateAdDto {
     @IsString()
     creative_id: string;
 
-    @IsEnum(Ad.Status)
+    @IsEnum(AdStatus)
     @IsOptional()
     status?: AdStatus;
 }
@@ -28,7 +32,7 @@ export class UpdateAdDto {
     @IsOptional()
     name?: string;
 
-    @IsEnum(Ad.Status)
+    @IsEnum(AdStatus)
     @IsOptional()
     status?: AdStatus;
 }

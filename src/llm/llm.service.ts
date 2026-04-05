@@ -40,7 +40,7 @@ export class LlmService implements OnModuleInit {
     private createDirectTools() {
         const tools = this.hayleeToolFactory.getTools();
         return Object.keys(tools).map((key) => {
-            if(key === 'create_adcreative') {
+            if(key === 'create_image') {
                 return tools[key].getStructuredTool(this.model);
             }
             return tools[key].getStructuredTool();

@@ -9,7 +9,7 @@ export const TargetingRegionDtoSchema = z.object({
 export const TargetingCityDtoSchema = z.object({
   key: z.string(),
   radius: z.number().int().min(1).optional(),
-  distance_unit: z.enum(["mile", "kilometer"] as [string, ...string[]]).optional(),
+  distance_unit: z.union([z.literal("mile"), z.literal("kilometer")]).optional(),
 })
 
 export const TargetingAutomationDtoSchema = z.object({

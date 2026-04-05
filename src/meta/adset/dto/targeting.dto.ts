@@ -36,7 +36,7 @@ export class TargetingAutomationDto {
     @IsNumber()
     @Min(0)
     @Max(1)
-    advantage_audience: 0 | 1;
+    advantage_audience: number;
 }
 
 export class TargetingGeoLocationsDto {

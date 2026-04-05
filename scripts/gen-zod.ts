@@ -5,7 +5,7 @@
  * Outputs one *.schema.ts file per DTO file into src/generated/schemas/
  */
 
-import { Project, ClassDeclaration, PropertyDeclaration, Decorator, SourceFile } from 'ts-morph'
+import { Project, ClassDeclaration, PropertyDeclaration, Decorator, SourceFile, SyntaxKind } from 'ts-morph'
 import * as path from 'path'
 import * as fs from 'fs'
 
@@ -171,11 +171,13 @@ function buildZodExpr(
   const decs  = prop.getDecorators()
   const names = new Set(decs.map(d => d.getName()))
 
-  const isOptional = names.has('IsOptional') || names.has('ValidateIf')
-  const isArray    = names.has('IsArray')
-  const hasNested  = names.has('ValidateNested')
+  const isOptional   = names.has('IsOptional') || names.has('ValidateIf')
+  const isArray      = names.has('IsArray')
+  const hasNested    = names.has('ValidateNested')
+  const initializer  = prop.getInitializer()?.getText()
 
-  // --- @ValidateNested + @Type(() => SomeClass) ---
+
+// --- @ValidateNested + @Type(() => SomeClass) ---
   if (hasNested) {
     const className = extractTypeArg(decs)
     if (className) {
@@ -187,7 +189,7 @@ function buildZodExpr(
     }
     const inner = className ? `${className}Schema` : 'z.object({})'
     const type  = isArray ? `z.array(${inner})` : inner
-    return isOptional ? `${type}.optional()` : type
+    return maybeOptOrDefault(type, isOptional, initializer)
   }
 
   // --- @IsEnum ---
@@ -205,48 +207,53 @@ function buildZodExpr(
       inner = `z.string() /* ${arg} */`
     }
     const type = isArray ? `z.array(${inner})` : inner
-    return isOptional ? `${type}.optional()` : type
+    return maybeOptOrDefault(type, isOptional, initializer)
   }
 
   // --- @IsIn([...]) ---
   const isInDec = decs.find(d => d.getName() === 'IsIn')
   if (isInDec) {
-    const arg  = isInDec.getArguments()[0]?.getText() ?? '[]'
-    const type = `z.enum(${arg} as [string, ...string[]])`
-    return isOptional ? `${type}.optional()` : type
+    const argNode = isInDec.getArguments()[0]
+    const elements = argNode?.asKind(SyntaxKind.ArrayLiteralExpression)?.getElements() ?? []
+    const literals = elements.map(el => `z.literal(${el.getText()})`)
+    const inner = literals.length === 1
+      ? literals[0]
+      : `z.union([${literals.join(', ')}])`
+    const type = isArray ? `z.array(${inner})` : inner
+    return maybeOptOrDefault(type, isOptional, initializer)
   }
 
   // --- string-family ---
   if (names.has('IsEmail')) {
-    return maybeOpt(isArray ? 'z.array(z.string().email())' : 'z.string().email()', isOptional)
+    return maybeOptOrDefault(isArray ? 'z.array(z.string().email())' : 'z.string().email()', isOptional, initializer)
   }
   if (names.has('IsUUID')) {
-    return maybeOpt(isArray ? 'z.array(z.string().uuid())' : 'z.string().uuid()', isOptional)
+    return maybeOptOrDefault(isArray ? 'z.array(z.string().uuid())' : 'z.string().uuid()', isOptional, initializer)
   }
   if (names.has('IsDateString')) {
-    return maybeOpt(isArray ? 'z.array(z.string())' : 'z.string() /* ISO datetime */', isOptional)
+    return maybeOptOrDefault(isArray ? 'z.array(z.string())' : 'z.string() /* ISO datetime */', isOptional, initializer)
   }
   if (names.has('IsISO31661Alpha2')) {
-    return maybeOpt(isArray ? 'z.array(z.string().length(2))' : 'z.string().length(2)', isOptional)
+    return maybeOptOrDefault(isArray ? 'z.array(z.string().length(2))' : 'z.string().length(2)', isOptional, initializer)
   }
   if (names.has('IsString')) {
-    return maybeOpt(isArray ? 'z.array(z.string())' : 'z.string()', isOptional)
+    return maybeOptOrDefault(isArray ? 'z.array(z.string())' : 'z.string()', isOptional, initializer)
   }
 
   // --- number-family ---
   if (names.has('IsInt') || names.has('IsNumber')) {
     let base = names.has('IsInt') ? 'z.number().int()' : 'z.number()'
     base = applyMinMax(base, decs)
-    return maybeOpt(isArray ? `z.array(${base})` : base, isOptional)
+    return maybeOptOrDefault(isArray ? `z.array(${base})` : base, isOptional, initializer)
   }
 
   // --- boolean ---
-  if (names.has('IsBoolean')) return maybeOpt('z.boolean()', isOptional)
+  if (names.has('IsBoolean')) return maybeOptOrDefault('z.boolean()', isOptional, initializer)
 
   // --- object / record ---
-  if (names.has('IsObject')) return maybeOpt('z.record(z.string(), z.unknown())', isOptional)
+  if (names.has('IsObject')) return maybeOptOrDefault('z.record(z.string(), z.unknown())', isOptional, initializer)
 
-  return maybeOpt('z.unknown()', isOptional)
+  return maybeOptOrDefault('z.unknown()', isOptional, initializer)
 }
 
 function extractTypeArg(decs: Decorator[]): string | null {
@@ -264,6 +271,8 @@ function applyMinMax(base: string, decs: Decorator[]): string {
   return base
 }
 
-function maybeOpt(expr: string, optional: boolean): string {
-  return optional ? `${expr}.optional()` : expr
+function maybeOptOrDefault(expr: string, optional: boolean, initializer?: string): string {
+  if (optional && initializer) return `${expr}.default(${initializer})`
+  if (optional) return `${expr}.optional()`
+  return expr
 }

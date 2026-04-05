@@ -1,5 +1,4 @@
 import { IsArray, IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateIf } from "class-validator";
-import { Campaign } from "facebook-nodejs-business-sdk";
 
 export enum CampaignObjectiveValue {
     OUTCOME_APP_PROMOTION = "OUTCOME_APP_PROMOTION",
@@ -56,7 +55,7 @@ export class CreateCampaignDto {
     @IsEnum(CampaignObjectiveValue)
     objective: CampaignObjectiveValue; 
 
-    @IsEnum(Campaign.Status)
+    @IsEnum(CampaignStatus)
     @IsOptional()
     status: CampaignStatus = CampaignStatus.PAUSED;
 
@@ -66,20 +65,20 @@ export class CreateCampaignDto {
     @ValidateIf(o => o.strategy === BudgetStrategy.ADSET_BUDGET)
     @IsBoolean()
     @IsNotEmpty()
-    is_adset_budget_sharing_enabled: boolean;
+    is_adset_budget_sharing_enabled?: boolean;
 
     @ValidateIf(o => o.strategy === BudgetStrategy.CAMPAIGN_BUDGET && !o.lifetime_budget) 
     @IsNotEmpty()
     @IsNumber()
-    daily_budget: number;
+    daily_budget?: number;
 
     @ValidateIf(o => o.strategy === BudgetStrategy.CAMPAIGN_BUDGET && !o.daily_budget)
     @IsNotEmpty()
     @IsNumber()
-    lifetime_budget: number;
+    lifetime_budget?: number;
 
     @IsNotEmpty()
-    @IsEnum(Campaign.BidStrategy)
+    @IsEnum(CampaignBidStrategy)
     bid_strategy: CampaignBidStrategy;
 
     @IsOptional()
