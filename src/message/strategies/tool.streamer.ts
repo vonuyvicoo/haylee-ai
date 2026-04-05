@@ -72,6 +72,18 @@ export class ToolStreamer implements IStreamer {
                             results: []
                         }
                     }));
+
+                    // THIS IS JUST FOR ADJUSTING THE FORMATTING IN THE UI.
+                    subscriber.next(new MessageEvent<LlmTokenPayload>("json", {
+                        data: {
+                            kind: EventKind.LLM_TOKEN,
+                            node: "model_request",
+                            content: [{ type: "text", text: "\n\n" }],
+                            model: "claude-opus-max",
+                            is_tool_output: false,
+                        }
+                    }));
+
                     break;
                 }
                 case 'on_tool_end': {
@@ -87,18 +99,8 @@ export class ToolStreamer implements IStreamer {
                             ]
                         }
                     }));
-                    
 
-                    // THIS IS JUST FOR ADJUSTING THE FORMATTING IN THE UI.
-                    subscriber.next(new MessageEvent<LlmTokenPayload>("json", {
-                        data: {
-                            kind: EventKind.LLM_TOKEN,
-                            node: "model_request",
-                            content: [{ type: "text", text: "\n\n" }],
-                            model: "claude-opus-max",
-                            is_tool_output: false,
-                        }
-                    }));
+                    break;
 
                 }
             }
