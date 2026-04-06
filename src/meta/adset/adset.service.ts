@@ -79,7 +79,8 @@ export class AdSetService {
             AdSet.Fields.end_time,
             AdSet.Fields.daily_budget,
             AdSet.Fields.lifetime_budget,
-            AdSet.Fields.promoted_object
+            AdSet.Fields.promoted_object,
+            AdSet.Fields.campaign_id
         ], {
         });
 
