@@ -30,6 +30,15 @@ export class CampaignController {
         return campaign;
     }
 
+    @Get(":campaign_id")
+    async findOne(
+        @Param("campaign_id") campaign_id: string,
+        @Session() session: UserSession
+    ) {
+        const campaign = await this.campaignService.findOne(campaign_id, session);
+        return campaign;
+    }
+
     @Patch(":campaign_id")
     async update(
         @Param("campaign_id") campaign_id: string,

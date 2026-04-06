@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_FILTER } from '@nestjs/core';
 import { PrismaClientExceptionFilter } from './exception-filters/prisma.filter';
+import { FacebookRequestErrorFilter } from './exception-filters/facebook.filter';
 import { IntegrationModule } from './integrations/integration.module';
 import { AdAccountModule } from './meta/ad-account/adaccount.module';
 import { AdSetModule } from './meta/adset/adset.module';
@@ -21,6 +22,11 @@ import { FilesModule } from './files/files.module';
 const ErrorProvider: Provider = {
     provide: APP_FILTER,
     useClass: PrismaClientExceptionFilter
+}
+
+const FacebookErrorProvider: Provider = {
+    provide: APP_FILTER,
+    useClass: FacebookRequestErrorFilter
 }
 
 @Module({
@@ -40,6 +46,6 @@ const ErrorProvider: Provider = {
         FilesModule
     ],
   controllers: [AppController],
-  providers: [AppService, ErrorProvider],
+  providers: [AppService, ErrorProvider, FacebookErrorProvider],
 })
 export class AppModule {}

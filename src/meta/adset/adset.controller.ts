@@ -35,6 +35,15 @@ export class AdSetController {
         return data;
     }
 
+    @Get(":adset_id")
+    async findOne(
+        @Session() session: UserSession,
+        @Param("adset_id") adset_id: string
+    ) {
+        const data = await this.adsetsService.findOne(adset_id, session);
+        return data;
+    }
+
     @Post()
     async create(
         @Body() payload: CreateAdSetDto,

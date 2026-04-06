@@ -1,7 +1,8 @@
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, ValidateIf, ValidateNested } from "class-validator";
+import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsObject, IsOptional, IsString, Validate, ValidateIf, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 import { BudgetStrategy } from "src/meta/campaign/dto/create-campaign.dto";
 import { MetaTargetingDto } from "./targeting.dto";
+import { BillingEventGoalValidatorConstraint } from "../validators/billing-event-goal.validator";
 
 export enum AdSetStatus {
     ACTIVE = "ACTIVE",
@@ -80,6 +81,7 @@ export class CreateAdSetDto {
     lifetime_budget?: number;
 
     @IsEnum(AdSetBillingEvent)
+    @Validate(BillingEventGoalValidatorConstraint)
     billing_event: AdSetBillingEvent;
 
     @IsEnum(AdSetOptimizationGoal)

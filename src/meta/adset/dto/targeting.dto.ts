@@ -108,10 +108,11 @@ export class MetaTargetingDto {
     @Max(65)
     age_max?: number;
     
+    @IsOptional()
     @IsObject()
     @ValidateNested()
     @Type(() => TargetingAutomationDto)
-    targeting_automation: TargetingAutomationDto;
+    targeting_automation?: TargetingAutomationDto;
 
     @IsOptional()
     @IsArray()
