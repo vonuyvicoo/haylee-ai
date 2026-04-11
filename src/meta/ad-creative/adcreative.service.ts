@@ -6,12 +6,16 @@ import { MetaCredentialService } from "../credentials/credential.service";
 import { CreateAdCreativeDto, QueryAdCreativeDto } from "./dto/create-adcreative.dto";
 import { UpdateAdCreativeDto } from "./dto/update-adcreative.dto";
 import { UserSession } from "@thallesp/nestjs-better-auth";
+import { FilesService } from "src/files/files.service";
 
 const META_API_VERSION = "v23.0";
 
 @Injectable()
 export class AdCreativeService {
-    constructor(private readonly creds: MetaCredentialService) {}
+    constructor(
+        private readonly creds: MetaCredentialService,
+        private readonly fileService: FilesService
+    ) {}
 
     async findMany(query: QueryAdCreativeDto, session: UserSession) {
         const token = await this.creds.getToken(session);
@@ -148,6 +152,39 @@ export class AdCreativeService {
             hash: imageResult.hash,
             url: imageResult.url,
             name: file.originalname,
+        };
+    }
+
+    async uploadFromMediaLibrary(ad_account_id: string, file_id: string, session: UserSession) {
+        const token = await this.creds.getToken(session);
+
+        const [blob, meta] = await Promise.all([
+            this.fileService.getFileContent(file_id, session),
+            this.fileService.findOne(file_id, session),
+        ]);
+
+        const buffer = Buffer.from(await blob.arrayBuffer());
+
+        const form = new FormData();
+        form.append("filename", buffer, {
+            filename: meta.file_name,
+            contentType: meta.type,
+        });
+        form.append("access_token", token);
+
+        const response = await axios.post<{ images: Record<string, { hash: string; url: string }> }>(
+            `https://graph.facebook.com/${META_API_VERSION}/${ad_account_id}/adimages`,
+            form,
+            { headers: form.getHeaders() }
+        );
+
+        const images = response.data.images;
+        const [imageResult] = Object.values(images);
+
+        return {
+            hash: imageResult.hash,
+            url: imageResult.url,
+            name: meta.file_name,
         };
     }
 }

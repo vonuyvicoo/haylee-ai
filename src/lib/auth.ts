@@ -31,7 +31,7 @@ export const auth = betterAuth({
     advanced: {
         crossSubDomainCookies: {
             enabled: true,
-            domain: process.env.DOMAIN || "localhost"
+            domain: process.env.NODE_ENV === 'local' ? process.env.DOMAIN_LOCAL : (process.env.DOMAIN || "localhost")
         }
     }, trustedOrigins: (process.env.TRUSTED_ORIGINS || "http://localhost:3000").split(",")
     //advanced: { disableOriginCheck: true }

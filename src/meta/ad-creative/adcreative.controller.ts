@@ -4,6 +4,7 @@ import { AdCreativeService } from "./adcreative.service";
 import { CreateAdCreativeDto, QueryAdCreativeDto } from "./dto/create-adcreative.dto";
 import { UpdateAdCreativeDto } from "./dto/update-adcreative.dto";
 import { Session, UserSession } from "@thallesp/nestjs-better-auth";
+import { MigrateAdCreativeDto } from "./dto/migrate-adcreative.dto";
 
 @Controller('meta/ad-creatives')
 export class AdCreativeController {
@@ -24,6 +25,15 @@ export class AdCreativeController {
         @Session() session: UserSession
     ) {
         return this.adCreativeService.create(payload, query, session);
+    }
+
+    @Post("migrate")
+    async migrateFromMediaLibrary(
+        @Query() query: QueryAdCreativeDto,
+        @Body() payload: MigrateAdCreativeDto,
+        @Session() session: UserSession
+    ) {
+        return this.adCreativeService.uploadFromMediaLibrary(query.ad_account_id, payload.file_id, session);
     }
 
     @Patch(":creative_id")
