@@ -6,6 +6,18 @@ import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { LLMFactory } from './factory/llm.factory';
 import { HayleeToolFactory } from './tools/factory';
 import { UserSession } from '@thallesp/nestjs-better-auth';
+import { MAIN_PROMPT } from './prompts/main.prompt';
+
+function serializeToolError(error: unknown): string {
+    // for fb purposes
+    if (!(error instanceof Error)) return String(error);
+    const parts: string[] = [error.message];
+    const e = error as unknown as Record<string, unknown>;
+    if (e['response'] != null) {
+        parts.push(JSON.stringify(e['response'], null, 2));
+    }
+    return parts.join('\n');
+}
 
 export const BANNED_WORDS = [
     "<script",
@@ -58,8 +70,9 @@ export class LlmService implements OnModuleInit {
                     } catch (error) {
                         console.error('[LLM] Tool error:', error);
                         return new ToolMessage({
-                            content: `Tool error: Please check your input and try again. (${JSON.stringify(error, null, 2)})`,
+                            content: `Tool error: ${serializeToolError(error)}`,
                             tool_call_id: request.toolCall.id!,
+                            status: 'error',
                         });
                     }
                 },
@@ -68,7 +81,7 @@ export class LlmService implements OnModuleInit {
             this.agent = createAgent({
                 model: this.model,
                 tools: [...mcpTools],
-                systemPrompt: "", // TODO: add main prompt
+                systemPrompt: MAIN_PROMPT,
                 middleware: [
                     handleToolErrors
                 ]
