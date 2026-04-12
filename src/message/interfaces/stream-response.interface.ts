@@ -69,6 +69,7 @@ export interface ToolPayload extends BaseEventPayload {
     tool_call_id?: string;
     status: ToolStatus;
     results: ToolResultContent[];
+    error?: unknown;
 }
 
 export interface ToolContent {

@@ -103,6 +103,19 @@ export class ToolStreamer implements IStreamer {
                     break;
 
                 }
+                case 'on_tool_error': {
+                    subscriber.next(new MessageEvent<ToolPayload>("json", {
+                        data: {
+                            kind: EventKind.TOOLS,
+                            node: "tools",
+                            name: toolChunk.name,
+                            status: ToolStatus.ERROR,
+                            tool_call_id: toolChunk.toolCallId,
+                            results: [],
+                            error: toolChunk.error
+                        }
+                    }))
+                }
             }
         } catch (err){ 
             console.error(err)
