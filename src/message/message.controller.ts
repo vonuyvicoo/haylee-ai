@@ -4,7 +4,7 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { Observable } from 'rxjs';
 import { StreamEvent } from './interfaces/stream-response.interface';
 import { Session, UserSession } from '@thallesp/nestjs-better-auth';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 @Controller('chat')
 export class MessageController {

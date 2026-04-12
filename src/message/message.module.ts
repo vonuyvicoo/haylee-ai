@@ -3,9 +3,10 @@ import { MessageService } from './message.service';
 import { MessageController } from './message.controller';
 import { LlmModule } from '../llm/llm.module';
 import { StreamerFactory } from './factory/streamer.factory';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-    imports: [LlmModule],
+    imports: [PrismaModule, LlmModule],
     providers: [MessageService, StreamerFactory],
     controllers: [MessageController]
 })

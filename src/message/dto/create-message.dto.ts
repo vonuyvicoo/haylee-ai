@@ -1,12 +1,11 @@
-import { Type } from "class-transformer";
-import { IsEnum, IsOptional, IsString, ValidateNested, } from "class-validator";
+import { IsEnum, IsOptional, IsString, } from "class-validator";
 
 export class CreateMessageDto {
     @IsString()
     message: string;
+    @IsString()
     @IsOptional()
-    @Type(() => IHistoryPayload)
-    conversation_history: IHistoryPayload[];
+    conversation_id?: string;
 }
 
 export enum IRole {

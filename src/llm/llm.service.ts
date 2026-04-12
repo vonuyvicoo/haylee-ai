@@ -1,4 +1,4 @@
-import {  Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {  Injectable, InternalServerErrorException, Logger, OnModuleInit } from '@nestjs/common';
 import { createAgent, createMiddleware, ReactAgent, ToolMessage } from 'langchain';
 import { ChatDeepSeek} from "@langchain/deepseek";
 import { IHistoryPayload, IRole } from '../message/dto/create-message.dto';
@@ -7,6 +7,8 @@ import { LLMFactory } from './factory/llm.factory';
 import { HayleeToolFactory } from './tools/factory';
 import { UserSession } from '@thallesp/nestjs-better-auth';
 import { MAIN_PROMPT } from './prompts/main.prompt';
+import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
+import { debugPort } from 'process';
 
 function serializeToolError(error: unknown): string {
     // for fb purposes
@@ -33,10 +35,9 @@ export class LlmService implements OnModuleInit {
     private readonly logger = new Logger(LlmService.name, { timestamp: true })
     //agents
     private agent: ReactAgent;
-    
     private model: ChatDeepSeek;
-
     private isInitialized: boolean = false;
+    private checkpointer: PostgresSaver;
     
     constructor(
         private readonly hayleeToolFactory: HayleeToolFactory,
@@ -46,7 +47,21 @@ export class LlmService implements OnModuleInit {
     }
 
     async onModuleInit() {
+        const dbUrl = process.env.DATABASE_URL;
+        if(!dbUrl) throw new InternalServerErrorException("Can't start app. No DATABASE_URL provided.");
+        this.checkpointer = PostgresSaver.fromConnString(dbUrl);
+        if(process.env.INIT_CHECKPOINTER === "true") {
+            await this.setupCheckpointer()
+        } else {
+            this.logger.log(`Skipping checkpointer setup. INIT_CHECKPOINTER is set to false`)
+        }
         await this.initialize();
+    }
+
+    private async setupCheckpointer() {
+        this.logger.log('Setting up PostgresSaver');
+        await this.checkpointer.setup();
+        this.logger.log('Finished Postgres checkpointer setup.');
     }
 
     private createDirectTools() {
@@ -84,39 +99,28 @@ export class LlmService implements OnModuleInit {
                 systemPrompt: MAIN_PROMPT,
                 middleware: [
                     handleToolErrors
-                ]
+                ],
+                checkpointer: this.checkpointer
             });
             this.isInitialized = true;
         }
     }
 
-    private convertToLangChainMessages(history: IHistoryPayload[]) {
-        return history.map(msg => {
-            if (msg.role === IRole.HUMAN) {
-                return new HumanMessage(msg.content);
-            }
-
-            return new AIMessage({
-                content: msg.content || "",
-            });
-        });
-    }
-
-    async *invoke(messages: IHistoryPayload[], session: UserSession, signal: AbortSignal) {
+    async *invoke(thread_id: string, message: string, session: UserSession, signal: AbortSignal) {
         try {
             await this.initialize();
-            const langchainMessages = this.convertToLangChainMessages(messages);
 
             for await (const [mode, chunk] of await this.agent.stream(
                 {
-                    messages: langchainMessages,
+                    messages: new HumanMessage(message),
                 }, 
                 { 
                     signal,
                     streamMode: ["messages", "custom", "updates", "tools"], 
                     recursionLimit: 50,
                     configurable: {
-                        session
+                        session,
+                        thread_id
                     }
                 }
             )) {

@@ -27,6 +27,7 @@
         "@gohighlevel/api-client": "^2.2.2",
         "@langchain/core": "^1.1.39",
         "@langchain/deepseek": "^1.0.2",
+        "@langchain/langgraph-checkpoint-postgres": "^1.0.1",
         "@langchain/openai": "^1.0.0",
         "@nestjs/common": "^11.0.1",
         "@nestjs/config": "^4.0.2",
