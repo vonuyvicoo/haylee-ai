@@ -8,7 +8,6 @@ export const CreateCampaignDtoSchema = z.object({
   objective: z.enum(CampaignObjectiveValue),
   status: z.enum(CampaignStatus).default(CampaignStatus.PAUSED),
   strategy: z.enum(BudgetStrategy),
-  is_adset_budget_sharing_enabled: z.boolean().optional(),
   daily_budget: z.number().optional(),
   lifetime_budget: z.number().optional(),
   bid_strategy: z.enum(CampaignBidStrategy),

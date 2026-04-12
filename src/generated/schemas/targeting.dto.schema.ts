@@ -41,7 +41,7 @@ export const MetaTargetingDtoSchema = z.object({
   geo_locations: TargetingGeoLocationsDtoSchema,
   age_min: z.number().int().min(13).max(65).optional(),
   age_max: z.number().int().min(13).max(65).optional(),
-  targeting_automation: TargetingAutomationDtoSchema,
+  targeting_automation: TargetingAutomationDtoSchema.optional(),
   genders: z.array(z.number().int()).optional(),
   flexible_spec: z.array(TargetingFlexibleSpecItemDtoSchema).optional(),
   publisher_platforms: z.array(z.string()).optional(),

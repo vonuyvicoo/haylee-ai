@@ -62,12 +62,7 @@ export class CreateCampaignDto {
     @IsEnum(BudgetStrategy)
     strategy: BudgetStrategy;
 
-    @ValidateIf(o => o.strategy === BudgetStrategy.ADSET_BUDGET)
-    @IsBoolean()
-    @IsNotEmpty()
-    is_adset_budget_sharing_enabled?: boolean;
-
-    @ValidateIf(o => o.strategy === BudgetStrategy.CAMPAIGN_BUDGET && !o.lifetime_budget) 
+    @ValidateIf(o => o.strategy === BudgetStrategy.CAMPAIGN_BUDGET && !o.lifetime_budget)
     @IsNotEmpty()
     @IsNumber()
     daily_budget?: number;

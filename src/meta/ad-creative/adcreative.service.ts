@@ -7,6 +7,7 @@ import { CreateAdCreativeDto, QueryAdCreativeDto } from "./dto/create-adcreative
 import { UpdateAdCreativeDto } from "./dto/update-adcreative.dto";
 import { UserSession } from "@thallesp/nestjs-better-auth";
 import { FilesService } from "src/files/files.service";
+import { MigrateAdCreativeDto } from "./dto/migrate-adcreative.dto";
 
 const META_API_VERSION = "v23.0";
 
@@ -155,12 +156,12 @@ export class AdCreativeService {
         };
     }
 
-    async uploadFromMediaLibrary(ad_account_id: string, file_id: string, session: UserSession) {
+    async uploadFromMediaLibrary(ad_account_id: string, payload: MigrateAdCreativeDto, session: UserSession) {
         const token = await this.creds.getToken(session);
 
         const [blob, meta] = await Promise.all([
-            this.fileService.getFileContent(file_id, session),
-            this.fileService.findOne(file_id, session),
+            this.fileService.getFileContent(payload.file_id, session),
+            this.fileService.findOne(payload.file_id, session),
         ]);
 
         const buffer = Buffer.from(await blob.arrayBuffer());

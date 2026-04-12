@@ -20,6 +20,8 @@ import { AdService } from 'src/meta/ads/ads.service';
 import { AdSetModule } from 'src/meta/adset/adset.module';
 import { AdModule } from 'src/meta/ads/ads.module';
 import { AdCreativeModule } from 'src/meta/ad-creative/adcreative.module';
+import { SearchInterestsTool } from './tools/implementation/search-interests.impl';
+import { UploadMediaLibraryToMetaTool } from './tools/implementation/upload_medialibrary_to_meta.impl';
 
 const HayleeToolProvider: Provider = {
     provide: HayleeToolFactory,
@@ -38,6 +40,8 @@ const HayleeToolProvider: Provider = {
         factory.register("create_adset", new CreateAdSetTool(adSetService));
         factory.register("create_ad", new CreateAdTool(adService));
         factory.register("create_adcreative", new CreateAdCreativeTool(adCreativeService));
+        factory.register("search_interests", new SearchInterestsTool(adSetService));
+        factory.register("upload_media_library_to_meta", new UploadMediaLibraryToMetaTool(adCreativeService));
         return factory;
     },
     inject: [CampaignService, ImageGeneratorService, FilesService, AdSetService, AdCreativeService, AdService]

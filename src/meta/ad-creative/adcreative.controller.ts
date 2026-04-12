@@ -33,7 +33,7 @@ export class AdCreativeController {
         @Body() payload: MigrateAdCreativeDto,
         @Session() session: UserSession
     ) {
-        return this.adCreativeService.uploadFromMediaLibrary(query.ad_account_id, payload.file_id, session);
+        return this.adCreativeService.uploadFromMediaLibrary(query.ad_account_id, payload, session);
     }
 
     @Patch(":creative_id")

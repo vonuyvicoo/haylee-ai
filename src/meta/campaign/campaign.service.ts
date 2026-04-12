@@ -80,7 +80,7 @@ export class CampaignService {
             [Campaign.Fields.objective]: payload.objective,
             [Campaign.Fields.special_ad_categories]: payload.special_ad_categories,
             [Campaign.Fields.bid_strategy]: payload.bid_strategy,
-            ...(!isCBO ? { ['is_adset_budget_sharing_enabled']: payload.is_adset_budget_sharing_enabled ?? false } : {}),
+            ...(!isCBO ? { ['is_adset_budget_sharing_enabled']: true } : {}),
             ...(isCBO && payload.daily_budget    ? { [Campaign.Fields.daily_budget]:    payload.daily_budget    * 100 } : {}),
             ...(isCBO && payload.lifetime_budget ? { [Campaign.Fields.lifetime_budget]: payload.lifetime_budget * 100 } : {}),
         });
@@ -97,8 +97,8 @@ export class CampaignService {
             [Campaign.Fields.name]: payload.name,
             [Campaign.Fields.status]: payload.status,
             [Campaign.Fields.objective]: payload.objective,
-            ...(payload.strategy !== undefined && !isCBO
-                ? { ['is_adset_budget_sharing_enabled']: payload.is_adset_budget_sharing_enabled ?? false }
+            ...(payload.is_adset_budget_sharing_enabled !== undefined
+                ? { ['is_adset_budget_sharing_enabled']: payload.is_adset_budget_sharing_enabled }
                 : {}),
             ...(payload.daily_budget    ? { [Campaign.Fields.daily_budget]:    payload.daily_budget    * 100 } : {}),
             ...(payload.lifetime_budget ? { [Campaign.Fields.lifetime_budget]: payload.lifetime_budget * 100 } : {}),

@@ -58,7 +58,7 @@ export class LlmService implements OnModuleInit {
                     } catch (error) {
                         console.error('[LLM] Tool error:', error);
                         return new ToolMessage({
-                            content: `Tool error: Please check your input and try again. (${error})`,
+                            content: `Tool error: Please check your input and try again. (${JSON.stringify(error, null, 2)})`,
                             tool_call_id: request.toolCall.id!,
                         });
                     }
