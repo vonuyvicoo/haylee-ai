@@ -33,8 +33,8 @@ export class MessageService {
         return message_payload;
     };
 
-    async graphInvoke(payload: CreateMessageDto, subscriber: Subscriber<StreamEvent>, session: UserSession) {
-        for await (const event of this.llmService.invoke(this.buildHistory(payload), session)) {
+    async graphInvoke(payload: CreateMessageDto, subscriber: Subscriber<StreamEvent>, session: UserSession, signal: AbortSignal) {
+        for await (const event of this.llmService.invoke(this.buildHistory(payload), session, signal)) {
             //langgraph mode
             const strategy = this.streamerFactory.create(event as any);
             strategy?.emit(event as any, subscriber);

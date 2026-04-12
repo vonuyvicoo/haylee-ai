@@ -102,8 +102,7 @@ export class LlmService implements OnModuleInit {
         });
     }
 
-    async *invoke(messages: IHistoryPayload[], session: UserSession) {
-        const controller = new AbortController();
+    async *invoke(messages: IHistoryPayload[], session: UserSession, signal: AbortSignal) {
         try {
             await this.initialize();
             const langchainMessages = this.convertToLangChainMessages(messages);
@@ -113,7 +112,7 @@ export class LlmService implements OnModuleInit {
                     messages: langchainMessages,
                 }, 
                 { 
-                    signal: controller.signal,
+                    signal,
                     streamMode: ["messages", "custom", "updates", "tools"], 
                     recursionLimit: 50,
                     configurable: {
