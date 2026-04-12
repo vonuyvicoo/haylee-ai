@@ -12,6 +12,7 @@ export enum EventKind {
     TOOLS = "tools",
     ERROR = "error",
     LOG_INFO = "log_info",
+    CONVERSATION_INFO = "conversation_info"
 }
 
 interface BaseEventPayload {
@@ -32,6 +33,19 @@ interface LlmContent {
     type: "text";
     text: string;
 }
+
+
+export interface ConversationInfoPayload extends BaseEventPayload {
+    kind: EventKind.CONVERSATION_INFO;
+    content: ConversationInfoContent;
+}
+
+interface ConversationInfoContent {
+    type: "created" | "updated" | "deleted" | "error";
+    subject: string;
+}
+
+
 
 export interface ReasoningTokenPayload extends BaseEventPayload {
     kind: EventKind.REASONING_TOKEN;
@@ -93,6 +107,7 @@ export type StreamEvent =
 | MessageEvent<ReasoningTokenPayload>
 | MessageEvent<ToolPayload>
 | MessageEvent<LogInfoPayload>
+| MessageEvent<ConversationInfoPayload>
 
 // langgraph
 export type LlmTokenChunk = ["messages", [BaseMessageChunk, Record<string, any>]];

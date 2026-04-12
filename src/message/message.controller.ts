@@ -1,10 +1,11 @@
-import { Body, Controller, Header, Logger, Post, Query, Req, Res, Sse } from '@nestjs/common';
+import { Body, Controller, Get, Header, Logger, Param, Post, Query, Req, Res, Sse } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { Observable } from 'rxjs';
 import { StreamEvent } from './interfaces/stream-response.interface';
 import { Session, UserSession } from '@thallesp/nestjs-better-auth';
 import { Response } from 'express';
+import { FindManyConversationsDto } from './dto/find-many-messages.dto';
 
 @Controller('chat')
 export class MessageController {
@@ -47,6 +48,24 @@ export class MessageController {
                 controller.abort()
             }
         });
+    }
+
+    @Get()
+    async findMany(
+        @Query() query: FindManyConversationsDto,
+        @Session() session: UserSession
+    ) {
+        const data = await this.messageService.findMany(query, session);
+        return { data }
+    }
+
+    @Get(":id")
+    async findOne(
+        @Session() session: UserSession,
+        @Param("id") id: string
+    ) {
+        const data = await this.messageService.findOne(id, session);
+        return { data }
     }
 
 }

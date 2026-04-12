@@ -9,6 +9,7 @@ import { UserSession } from '@thallesp/nestjs-better-auth';
 import { MAIN_PROMPT } from './prompts/main.prompt';
 import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 import { debugPort } from 'process';
+import { RunnableConfig } from '@langchain/core/runnables';
 
 function serializeToolError(error: unknown): string {
     // for fb purposes
@@ -132,5 +133,20 @@ export class LlmService implements OnModuleInit {
         } catch (error) {
             console.error('[LLM] Error during invoke:', error);
         }
+    }
+    
+
+    // internal DO NOT EXPOSE
+    async _findManyMessages(thread_id: string) {
+        const config: RunnableConfig = {
+            configurable: {
+                thread_id
+            }
+        };
+
+        const tuple = await this.checkpointer.getTuple(config);
+        const messages = tuple?.checkpoint?.channel_values?.messages ?? [];
+
+        return messages;
     }
 }
