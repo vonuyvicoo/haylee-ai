@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, Logger } from '@nestjs/common';
 import { Subscriber } from 'rxjs';
-import { LlmService } from '../llm/llm.service';
+import { AgentService } from '../agent/agent.service';
 import { CreateMessageDto, IHistoryPayload, IRole, } from './dto/create-message.dto';
 import { ConversationInfoPayload, EventKind, StreamEvent } from './interfaces/stream-response.interface';
 import { StreamerFactory } from './factory/streamer.factory';
@@ -12,7 +12,7 @@ import { FindManyConversationsDto } from './dto/find-many-messages.dto';
 export class MessageService {
     private readonly logger = new Logger(MessageService.name, { timestamp: true })
     constructor(
-        private llmService: LlmService,
+        private agentService: AgentService,
         private readonly streamerFactory: StreamerFactory,
         private readonly prisma: PrismaService
     ) {
@@ -52,7 +52,7 @@ export class MessageService {
 
     async findOne(thread_id: string, session: UserSession) {
         const conv = await this._findOneDB(thread_id, session);
-        const messages = await this.llmService._findManyMessages(conv.id);
+        const messages = await this.agentService._findManyMessages(conv.id);
         return messages;
     }
 
@@ -98,7 +98,7 @@ export class MessageService {
                 });
         }
 
-        for await (const event of this.llmService.invoke(thread_id, payload.message, session, signal)) {
+        for await (const event of this.agentService.invoke(thread_id, payload.message, session, signal)) {
             const strategy = this.streamerFactory.create(event as any);
             strategy?.emit(event as any, subscriber);
         }

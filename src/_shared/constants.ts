@@ -30,3 +30,4 @@ export const INVOICE_RETRYING = 'invoice.retrying';
 
 export const HAYLEE_TOOL_TOKEN = "HAYLEE_TOOL";
 export const MAIN_LLM_TOKEN = "MAIN_LLM";
+export const HAYLEE_SUBAGENT_TOKEN = "HAYLEE_SUBAGENT";

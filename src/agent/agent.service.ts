@@ -20,8 +20,8 @@ export const BANNED_WORDS = [
 ]
 
 @Injectable()
-export class LlmService implements OnModuleInit {
-    private readonly logger = new Logger(LlmService.name, { timestamp: true })
+export class AgentService implements OnModuleInit {
+    private readonly logger = new Logger(AgentService.name, { timestamp: true })
     //agents
     private agent: ReactAgent;
     private checkpointer: PostgresSaver;

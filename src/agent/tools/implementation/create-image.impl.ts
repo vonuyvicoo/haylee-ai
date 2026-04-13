@@ -5,7 +5,7 @@ import z from "zod";
 import { ImageGeneratorService } from "src/image-generator/image-generator.service";
 import { FilesService } from "src/files/files.service";
 import { UserSession } from "@thallesp/nestjs-better-auth";
-import { AD_CREATIVE_SKILL } from "src/llm/prompts/adcreative.skill";
+import { AD_CREATIVE_SKILL } from "src/agent/prompts/adcreative.skill";
 import { Inject, Injectable } from "@nestjs/common";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 

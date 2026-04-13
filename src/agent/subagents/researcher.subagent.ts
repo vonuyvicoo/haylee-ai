@@ -2,6 +2,7 @@ import { createAgent, HumanMessage, ReactAgent } from "langchain";
 import { IRunnableSubagent, RunnableInvocationParams } from "./runnable-subagent";
 import z from "zod";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
+import { Injectable } from "@nestjs/common";
 
 export const ResearchSubAgentSchema = z.object({
     task: z.string().describe("Detailed task instructions for the subagent.")
@@ -9,6 +10,7 @@ export const ResearchSubAgentSchema = z.object({
 
 export type ResearchSubAgentParams = z.infer<typeof ResearchSubAgentSchema>;
 
+@Injectable()
 export class ResearchSubAgent implements IRunnableSubagent<ResearchSubAgentParams> {
     private agent: ReactAgent;
 

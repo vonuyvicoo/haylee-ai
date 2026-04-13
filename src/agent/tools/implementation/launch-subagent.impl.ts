@@ -3,7 +3,7 @@ import { HayleeTool } from "../base";
 import { RunnableConfig } from "@langchain/core/runnables";
 import z from "zod";
 import { AdService } from "src/meta/ads/ads.service";
-import { RunnableSubAgentFactory, RunnableSubAgentType } from "src/llm/subagents/runnable-subagent.factory";
+import { RunnableSubAgentFactory, RunnableSubAgentType } from "src/agent/subagents/runnable-subagent.factory";
 import { Inject, Injectable } from "@nestjs/common";
 import { MAIN_LLM_TOKEN } from "src/_shared/constants";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
