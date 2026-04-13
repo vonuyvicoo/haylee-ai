@@ -1,3 +1,5 @@
+<iframe width="560" height="315" src="https://www.youtube.com/embed/IGr34GQ0tWQ?si=ZL2M5NvD-dakH8wn" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 # Haylee AI - Your personal Claude Code for Marketing
 
 Haylee AI is a fully agentic and AI-native tool to automate managing of ads. 
