@@ -2,11 +2,12 @@ import { StructuredTool, tool } from "langchain";
 import { HayleeTool } from "../base";
 import { RunnableConfig } from "@langchain/core/runnables";
 import z from "zod";
-import { ChatDeepSeek } from "@langchain/deepseek";
 import { ImageGeneratorService } from "src/image-generator/image-generator.service";
 import { FilesService } from "src/files/files.service";
 import { UserSession } from "@thallesp/nestjs-better-auth";
 import { AD_CREATIVE_SKILL } from "src/llm/prompts/adcreative.skill";
+import { Inject, Injectable } from "@nestjs/common";
+import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 
 export const CreateImageToolSchema = z.object({
     query: z.string().describe("A rephrased query of the user"),
@@ -17,18 +18,21 @@ export const CreateImageToolSchema = z.object({
 
 export type CreateImageToolParams = z.infer<typeof CreateImageToolSchema>;
 
+
+@Injectable()
 export class CreateImageTool extends HayleeTool {
     constructor(
         private imgGen: ImageGeneratorService,
         private fileService: FilesService,
+        @Inject("MAIN_LLM") private readonly model: BaseChatModel
     ){
         super();
     }
-    getStructuredTool(model: ChatDeepSeek): StructuredTool {
+    getStructuredTool(): StructuredTool {
         
         return tool(
             async (params: CreateImageToolParams, config: RunnableConfig) => {
-                const html = await model.invoke(`Create an ad creative based on the user's query: ${params.query}.
+                const html = await this.model.invoke(`Create an ad creative based on the user's query: ${params.query}.
 Return the FULL HTML file.
 Don't do external references.
 Your output will be screenshotted on a ${params.width}px width by ${params.height}px height canvas.

@@ -5,6 +5,7 @@ import z from "zod";
 import { CreateAdCreativeDtoSchema, QueryAdCreativeDtoSchema } from "src/generated/schemas/create-adcreative.dto.schema";
 import { AdCreativeService } from "src/meta/ad-creative/adcreative.service";
 import { Refine } from "src/_shared";
+import { Injectable } from "@nestjs/common";
 
 export const CreateAdCreativeDto_QueryAdCreativeDtoSchema = z.object({ ...CreateAdCreativeDtoSchema.shape, ...QueryAdCreativeDtoSchema.shape });
 export type CreateAdCreativeDto_QueryAdCreativeDto = z.infer<typeof CreateAdCreativeDto_QueryAdCreativeDtoSchema>;
@@ -26,6 +27,7 @@ export const CreateAdCreativeRefinement: Refine<CreateAdCreativeDto_QueryAdCreat
     }
 }
 
+@Injectable()
 export class CreateAdCreativeTool extends HayleeTool {
     constructor(private metaAdCreativeService: AdCreativeService){
         super();

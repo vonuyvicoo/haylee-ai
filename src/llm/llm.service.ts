@@ -1,26 +1,14 @@
-import {  Injectable, InternalServerErrorException, Logger, OnModuleInit } from '@nestjs/common';
-import { createAgent, createMiddleware, ReactAgent, ToolMessage } from 'langchain';
-import { ChatDeepSeek} from "@langchain/deepseek";
-import { IHistoryPayload, IRole } from '../message/dto/create-message.dto';
-import { HumanMessage, AIMessage } from "@langchain/core/messages";
-import { LLMFactory } from './factory/llm.factory';
-import { HayleeToolFactory } from './tools/factory';
+import {  Inject, Injectable, InternalServerErrorException, Logger, OnModuleInit } from '@nestjs/common';
+import { createAgent, ReactAgent, } from 'langchain';
+import { HumanMessage, } from "@langchain/core/messages";
 import { UserSession } from '@thallesp/nestjs-better-auth';
 import { MAIN_PROMPT } from './prompts/main.prompt';
 import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
-import { debugPort } from 'process';
 import { RunnableConfig } from '@langchain/core/runnables';
-
-function serializeToolError(error: unknown): string {
-    // for fb purposes
-    if (!(error instanceof Error)) return String(error);
-    const parts: string[] = [error.message];
-    const e = error as unknown as Record<string, unknown>;
-    if (e['response'] != null) {
-        parts.push(JSON.stringify(e['response'], null, 2));
-    }
-    return parts.join('\n');
-}
+import { BaseChatModel } from '@langchain/core/language_models/chat_models';
+import { HAYLEE_TOOL_TOKEN, MAIN_LLM_TOKEN } from 'src/_shared/constants';
+import { HayleeTool } from './tools/base';
+import { handleToolErrors } from './middleware/tool-error.middleware';
 
 export const BANNED_WORDS = [
     "<script",
@@ -36,15 +24,25 @@ export class LlmService implements OnModuleInit {
     private readonly logger = new Logger(LlmService.name, { timestamp: true })
     //agents
     private agent: ReactAgent;
-    private model: ChatDeepSeek;
-    private isInitialized: boolean = false;
     private checkpointer: PostgresSaver;
-    
+
     constructor(
-        private readonly hayleeToolFactory: HayleeToolFactory,
-        private readonly legacyLLMProvider: LLMFactory 
+        @Inject(HAYLEE_TOOL_TOKEN) private readonly tools: HayleeTool[],
+        @Inject(MAIN_LLM_TOKEN) private readonly model: BaseChatModel
     ) {
-        this.model = this.legacyLLMProvider.createMainLLM();
+        const agentTools = this.createDirectTools();
+        this.logger.log(`Loaded ${agentTools.length} tools`)
+        
+        this.agent = createAgent({
+            model: this.model,
+            tools: [...agentTools],
+            systemPrompt: MAIN_PROMPT,
+            middleware: [
+                handleToolErrors
+            ],
+            checkpointer: this.checkpointer
+        });
+
     }
 
     async onModuleInit() {
@@ -56,7 +54,6 @@ export class LlmService implements OnModuleInit {
         } else {
             this.logger.log(`Skipping checkpointer setup. INIT_CHECKPOINTER is set to false`)
         }
-        await this.initialize();
     }
 
     private async setupCheckpointer() {
@@ -66,7 +63,7 @@ export class LlmService implements OnModuleInit {
     }
 
     private createDirectTools() {
-        const tools = this.hayleeToolFactory.getTools();
+        const tools = this.tools;
         return Object.keys(tools).map((key) => {
             if(key === 'create_image') {
                 return tools[key].getStructuredTool(this.model);
@@ -75,46 +72,10 @@ export class LlmService implements OnModuleInit {
         })
     }
 
-    private async initialize() {
-        if (!this.isInitialized) {
-            const mcpTools = this.createDirectTools();
-            const handleToolErrors = createMiddleware({
-                name: "HandleToolErrors",
-                wrapToolCall: async (request, handler) => {
-                    try {
-                        return await handler(request);
-                    } catch (error) {
-                        console.error('[LLM] Tool error:', error);
-                        return new ToolMessage({
-                            content: `Tool error: ${serializeToolError(error)}`,
-                            tool_call_id: request.toolCall.id!,
-                            status: 'error',
-                        });
-                    }
-                },
-            });
-
-            this.agent = createAgent({
-                model: this.model,
-                tools: [...mcpTools],
-                systemPrompt: MAIN_PROMPT,
-                middleware: [
-                    handleToolErrors
-                ],
-                checkpointer: this.checkpointer
-            });
-            this.isInitialized = true;
-        }
-    }
-
     async *invoke(thread_id: string, message: string, session: UserSession, signal: AbortSignal) {
         try {
-            await this.initialize();
-
             for await (const [mode, chunk] of await this.agent.stream(
-                {
-                    messages: new HumanMessage(message),
-                }, 
+                { messages: new HumanMessage(message) }, 
                 { 
                     signal,
                     streamMode: ["messages", "custom", "updates", "tools"], 
@@ -125,8 +86,6 @@ export class LlmService implements OnModuleInit {
                     }
                 }
             )) {
-                if(mode === 'updates') {
-                }
                 yield [mode, chunk] as const;
             }
 

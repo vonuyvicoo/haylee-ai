@@ -5,10 +5,12 @@ import z from "zod";
 import { QueryAdCreativeDtoSchema } from "src/generated/schemas/create-adcreative.dto.schema";
 import { AdCreativeService } from "src/meta/ad-creative/adcreative.service";
 import { MigrateAdCreativeDtoSchema } from "src/generated/schemas/migrate-adcreative.dto.schema";
+import { Injectable } from "@nestjs/common";
 
 export const MigrateAdCreativeDto_QueryAdCreativeDtoSchema = z.object({ ...MigrateAdCreativeDtoSchema.shape, ...QueryAdCreativeDtoSchema.shape });
 export type MigrateAdCreativeDto_QueryAdCreativeDto = z.infer<typeof MigrateAdCreativeDto_QueryAdCreativeDtoSchema>;
 
+@Injectable()
 export class UploadMediaLibraryToMetaTool extends HayleeTool {
     constructor(private metaAdCreativeService: AdCreativeService){
         super();

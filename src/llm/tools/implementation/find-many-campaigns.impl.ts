@@ -4,7 +4,9 @@ import { CampaignService } from "src/meta/campaign/campaign.service";
 import { FindManyCampaignDto } from "src/meta/campaign/dto/find-many.dto";
 import { FindManyCampaignDtoSchema } from "src/generated/schemas/find-many.dto.schema";
 import { RunnableConfig } from "@langchain/core/runnables";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class FindManyCampaignsTool extends HayleeTool {
     constructor(private metaCampaignService: CampaignService){
         super();

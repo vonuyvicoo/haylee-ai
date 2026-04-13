@@ -7,6 +7,7 @@ import { CreateAdSetDtoSchema, QueryAdSetDtoSchema } from "src/generated/schemas
 import { Refine } from "src/_shared";
 import { BudgetStrategy } from "src/meta/campaign/dto/create-campaign.dto";
 import { GOAL_TO_BILLING } from "src/_shared/constants";
+import { Injectable } from "@nestjs/common";
 
 export const CreateAdSetDto_QueryAdSetDtoSchema = z.object({ ...CreateAdSetDtoSchema.shape, ...QueryAdSetDtoSchema.shape });
 export type CreateAdSetDto_QueryAdSetDto = z.infer<typeof CreateAdSetDto_QueryAdSetDtoSchema>;
@@ -43,7 +44,7 @@ export const CreateAdSetRefinement: Refine<CreateAdSetDto_QueryAdSetDto> = (v, c
 }
 
 
-
+@Injectable()
 export class CreateAdSetTool extends HayleeTool {
     constructor(private metaAdSetService: AdSetService){
         super();

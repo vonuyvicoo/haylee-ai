@@ -4,10 +4,11 @@ import { RunnableConfig } from "@langchain/core/runnables";
 import z from "zod";
 import { FindManyTargetingOptionsDtoSchema } from "src/generated/schemas/find-many-target.dto.schema";
 import { AdSetService } from "src/meta/adset/adset.service";
+import { Injectable } from "@nestjs/common";
 
 export type SearchInterestsDto = z.infer<typeof FindManyTargetingOptionsDtoSchema>;
 
-
+@Injectable()
 export class SearchInterestsTool extends HayleeTool {
     constructor(private adSetService: AdSetService){
         super();

@@ -6,6 +6,7 @@ import { CreateCampaignDtoSchema, QueryCampaignDtoSchema } from "src/generated/s
 import z from "zod";
 import { BudgetStrategy } from "src/meta/campaign/dto/create-campaign.dto";
 import { Refine } from "src/_shared";
+import { Injectable } from "@nestjs/common";
 
 export const CreateCampaignDto_QueryCampaignDtoSchema = z.object({ ...CreateCampaignDtoSchema.shape, ...QueryCampaignDtoSchema.shape });
 export type CreateCampaignDto_QueryCampaignDto = z.infer<typeof CreateCampaignDto_QueryCampaignDtoSchema>;
@@ -32,6 +33,7 @@ export const CreateCampaignRefinement: Refine<CreateCampaignDto_QueryCampaignDto
     }
 }
 
+@Injectable()
 export class CreateCampaignTool extends HayleeTool {
     constructor(private metaCampaignService: CampaignService){
         super();

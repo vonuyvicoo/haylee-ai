@@ -27,3 +27,6 @@ export const INVOICE_FAILED = 'invoice.failed';
 export const INVOICE_SCHEDULED = 'invoice.scheduled';
 export const INVOICE_RETRYING = 'invoice.retrying';
 
+
+export const HAYLEE_TOOL_TOKEN = "HAYLEE_TOOL";
+export const MAIN_LLM_TOKEN = "MAIN_LLM";
