@@ -17,12 +17,14 @@ import { UpdateFileDto } from "./dto/update-file.dto";
 import { FileInterceptor } from "@nestjs/platform-express";
 import type { Response } from "express";
 import { Session, UserSession } from "@thallesp/nestjs-better-auth";
+import { AllowMultipart } from "src/_shared/decorators/allow-multipart.decorator";
 
 @Controller("files")
 export class FilesController {
     constructor(private readonly filesService: FilesService) {}
 
     @Post()
+    @AllowMultipart()
     @UseInterceptors(FileInterceptor("file"))
     async create(
         @Body() createFileDto: CreateFileDto,
@@ -67,6 +69,7 @@ export class FilesController {
     }
 
     @Patch(":id/content")
+    @AllowMultipart()
     @UseInterceptors(FileInterceptor("file"))
     async updateContent(
         @Param("id") id: string,

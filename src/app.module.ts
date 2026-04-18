@@ -6,7 +6,7 @@ import { auth } from './lib/auth';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { IntegrationModule } from './integrations/integration.module';
 import { AdAccountModule } from './meta/ad-account/adaccount.module';
 import { AdSetModule } from './meta/adset/adset.module';
@@ -18,6 +18,9 @@ import { ImageGeneratorModule } from './image-generator/image-generator.module';
 import { FilesModule } from './files/files.module';
 import { PrismaClientExceptionFilter } from './_shared/filters/prisma.filter';
 import { FacebookRequestErrorFilter } from './_shared/filters/facebook.filter';
+import { ConfigModule } from "@nestjs/config";
+import * as Joi from "joi";
+import { CSRFGuard } from './_shared/guards/csrf.guard';
 
 const ErrorProvider: Provider = {
     provide: APP_FILTER,
@@ -29,9 +32,22 @@ const FacebookErrorProvider: Provider = {
     useClass: FacebookRequestErrorFilter
 }
 
+const CsrfGuardProvider: Provider = {
+    provide: APP_GUARD,
+    useClass: CSRFGuard
+}
+
 @Module({
   imports: [
         AuthModule.forRoot({ auth }), 
+        ConfigModule.forRoot({
+            isGlobal: true,
+            validationSchema: Joi.object({
+                TRUSTED_ORIGINS: Joi.string(),
+                DATABASE_URL: Joi.string(),
+                DOMAIN: Joi.string(),
+            })
+        }),
         UserModule,
         PrismaModule,
         EventEmitterModule.forRoot(),
@@ -46,6 +62,6 @@ const FacebookErrorProvider: Provider = {
         FilesModule
     ],
   controllers: [AppController],
-  providers: [AppService, ErrorProvider, FacebookErrorProvider],
+  providers: [AppService, ErrorProvider, FacebookErrorProvider, CsrfGuardProvider],
 })
 export class AppModule {}

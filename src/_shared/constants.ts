@@ -1,7 +1,3 @@
-import { SubscriptionCycleStatus, SubscriptionPlanStatus, SubscriptionType } from "prisma/generated/prisma";
-
-import Stripe from "stripe";
-
 // Meta Ads — valid billing events per optimization goal (buying_type=AUCTION)
 // Source: https://developers.facebook.com/docs/marketing-api/bidding/billing-events
 export const GOAL_TO_BILLING: Record<string, string[]> = {
