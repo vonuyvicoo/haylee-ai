@@ -6,7 +6,7 @@ import { IAuthorizerOauth } from "./interfaces";
 import { CallbackIntegrationDto } from "./dto/callback-integration.dto";
 import { CredentialType } from "./types";
 import { UserSession } from "@thallesp/nestjs-better-auth";
-import { EncryptionService } from "src/encryption/encryption.service";
+import { EncryptionService } from "src/_shared/utils/encryption/encryption.service";
 
 @Injectable()
 export class IntegrationService {

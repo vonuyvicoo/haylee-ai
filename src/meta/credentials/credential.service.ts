@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { IntegrationService } from "src/integrations/integration.service";
-import { EncryptionService } from "src/encryption/encryption.service";
+import { EncryptionService } from "src/_shared/utils/encryption/encryption.service";
 import { IntegrationType } from "prisma/generated/prisma";
 import { UserSession } from "@thallesp/nestjs-better-auth";
 import { Request } from "express";

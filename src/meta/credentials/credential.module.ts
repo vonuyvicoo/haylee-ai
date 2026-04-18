@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { EncryptionModule } from "src/encryption/encryption.module";
+import { EncryptionModule } from "src/_shared/utils/encryption/encryption.module";
 import { IntegrationModule } from "src/integrations/integration.module";
 import { MetaCredentialService } from "./credential.service";
 

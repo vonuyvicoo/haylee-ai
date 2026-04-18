@@ -7,8 +7,6 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_FILTER } from '@nestjs/core';
-import { PrismaClientExceptionFilter } from './exception-filters/prisma.filter';
-import { FacebookRequestErrorFilter } from './exception-filters/facebook.filter';
 import { IntegrationModule } from './integrations/integration.module';
 import { AdAccountModule } from './meta/ad-account/adaccount.module';
 import { AdSetModule } from './meta/adset/adset.module';
@@ -18,6 +16,8 @@ import { AdCreativeModule } from './meta/ad-creative/adcreative.module';
 import { MessageModule } from './message/message.module';
 import { ImageGeneratorModule } from './image-generator/image-generator.module';
 import { FilesModule } from './files/files.module';
+import { PrismaClientExceptionFilter } from './_shared/filters/prisma.filter';
+import { FacebookRequestErrorFilter } from './_shared/filters/facebook.filter';
 
 const ErrorProvider: Provider = {
     provide: APP_FILTER,
