@@ -4,6 +4,7 @@ import { FindManyCampaignDto } from "./dto/find-many.dto";
 import { CreateCampaignDto } from "./dto/create-campaign.dto";
 import { UpdateCampaignDto } from "./dto/update-campaign.dto";
 import { Session, UserSession } from "@thallesp/nestjs-better-auth";
+import { FindManyCampaignInsightsDto } from "./dto/find-many-campaign-insights.dto";
 
 @Controller('meta/campaigns')
 export class CampaignController {
@@ -38,6 +39,17 @@ export class CampaignController {
         const campaign = await this.campaignService.findOne(campaign_id, session);
         return campaign;
     }
+
+   @Get(":campaign_id/insights")
+    async getInsights(
+        @Param("campaign_id") campaign_id: string,
+        @Session() session: UserSession,
+        @Query() query: FindManyCampaignInsightsDto
+    ) {
+        const campaign = await this.campaignService.getInsights(campaign_id, query, session);
+        return campaign;
+    }
+
 
     @Patch(":campaign_id")
     async update(

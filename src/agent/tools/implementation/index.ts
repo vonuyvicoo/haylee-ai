@@ -7,3 +7,6 @@ export * from "./create-image.impl";
 export * from "./search-interests.impl";
 export * from "./upload_medialibrary_to_meta.impl";
 export * from "./launch-researcher-subagent.impl";
+export * from "./get-ad-insights.impl";
+export * from "./get-adset-insights.impl";
+export * from "./get-campaign.insights.impl";

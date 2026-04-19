@@ -5,7 +5,7 @@
  * Outputs one *.schema.ts file per DTO file into src/generated/schemas/
  */
 
-import { Project, ClassDeclaration, PropertyDeclaration, Decorator, SourceFile, SyntaxKind } from 'ts-morph'
+import { Project, ClassDeclaration, PropertyDeclaration, Decorator, SourceFile, SyntaxKind, Node } from 'ts-morph'
 import * as path from 'path'
 import * as fs from 'fs'
 
@@ -40,16 +40,40 @@ for (const sourceFile of project.getSourceFiles()) {
     // Resolve the import: relative paths OR baseUrl-rooted paths (e.g. "src/meta/...")
     const dir = path.dirname(sourceFile.getFilePath())
     const candidates = spec.startsWith('.')
-      ? [path.resolve(dir, spec + '.ts'), path.resolve(dir, spec)]
-      : [path.resolve(API_ROOT, spec + '.ts'), path.resolve(API_ROOT, spec)]
+      ? [
+          path.resolve(dir, spec + '.ts'),
+          path.resolve(dir, spec),
+          path.resolve(dir, spec + '/index.ts'),
+        ]
+      : [
+          path.resolve(API_ROOT, spec + '.ts'),
+          path.resolve(API_ROOT, spec),
+          path.resolve(API_ROOT, spec + '/index.ts'),
+        ]
 
-    const impFile = candidates.map(c => project.getSourceFile(c)).find(Boolean)
+    const impFile = candidates
+      .map(c => project.getSourceFile(c) ?? (fs.existsSync(c) && fs.statSync(c).isFile() ? project.addSourceFileAtPath(c) : undefined))
+      .find(Boolean)
     if (!impFile) continue // truly a node_module or unresolvable
 
     for (const named of imp.getNamedImports()) {
       const n = named.getName()
-      if (impFile.getEnum(n))  importedEnums.set(n, impFile.getFilePath())
-      if (impFile.getClass(n)) importedClasses.set(n, impFile.getFilePath())
+      // Check direct definition first
+      if (impFile.getEnum(n)) {
+        importedEnums.set(n, impFile.getFilePath())
+      } else if (impFile.getClass(n)) {
+        importedClasses.set(n, impFile.getFilePath())
+      } else {
+        // Follow re-exports (e.g. barrel index.ts with export * from "./enums")
+        const decls = impFile.getExportedDeclarations().get(n)
+        if (decls) {
+          for (const decl of decls) {
+            const sf = decl.getSourceFile()
+            if (decl.getKind() === SyntaxKind.EnumDeclaration)  { importedEnums.set(n, sf.getFilePath()); break }
+            if (decl.getKind() === SyntaxKind.ClassDeclaration) { importedClasses.set(n, sf.getFilePath()); break }
+          }
+        }
+      }
     }
   }
 
@@ -73,6 +97,14 @@ for (const sourceFile of project.getSourceFiles()) {
     }
 
     const propLines: string[] = []
+    // Include inherited properties (base class chain, excluding PartialType)
+    for (const prop of collectBaseProperties(cls, importedClasses, project)) {
+      const zodExpr = buildZodExpr(
+        prop, localEnums, importedEnums, importedClasses,
+        usedLocalEnums, usedExtEnums, usedExtSchemas,
+      )
+      propLines.push(`  ${prop.getName()}: ${zodExpr}`)
+    }
     for (const prop of cls.getProperties()) {
       const zodExpr = buildZodExpr(
         prop, localEnums, importedEnums, importedClasses,
@@ -147,6 +179,48 @@ for (const sourceFile of project.getSourceFiles()) {
 
 function relativeFromOutDir(filePath: string): string {
   return './' + path.relative(OUT_DIR, filePath.replace(/\.ts$/, '')).replace(/\\/g, '/')
+}
+
+function collectBaseProperties(
+  cls: ClassDeclaration,
+  importedClasses: Map<string, string>,
+  project: Project,
+): PropertyDeclaration[] {
+  const result: PropertyDeclaration[] = []
+  for (const clause of cls.getHeritageClauses()) {
+    for (const typeNode of clause.getTypeNodes()) {
+      if (typeNode.getText().startsWith('PartialType(')) continue
+
+      let baseClass: ClassDeclaration | undefined
+
+      // Try type checker first (works when file is already in project)
+      const symbol = typeNode.getExpression().getSymbol()
+      if (symbol) {
+        for (const decl of symbol.getDeclarations() ?? []) {
+          if (Node.isClassDeclaration(decl)) { baseClass = decl; break }
+        }
+      }
+
+      // Fallback: use importedClasses map + on-demand file load
+      if (!baseClass) {
+        const baseName = typeNode.getExpression().getText().replace(/<.*>/, '').trim()
+        const filePath = importedClasses.get(baseName)
+        if (filePath) {
+          let sf = project.getSourceFile(filePath)
+          if (!sf && fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            sf = project.addSourceFileAtPath(filePath)
+          }
+          baseClass = sf?.getClass(baseName)
+        }
+      }
+
+      if (baseClass) {
+        result.push(...collectBaseProperties(baseClass, importedClasses, project))
+        result.push(...baseClass.getProperties())
+      }
+    }
+  }
+  return result
 }
 
 function getPartialTypeBase(cls: ClassDeclaration): string | null {

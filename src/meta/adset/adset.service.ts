@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from "@nestjs/common";
-import { AdAccount, AdSet, Campaign, FacebookAdsApi } from "facebook-nodejs-business-sdk";
+import { AdAccount, AdSet, AdsInsights, Campaign, FacebookAdsApi } from "facebook-nodejs-business-sdk";
 import { GraphEdgeResponse } from "../types";
 import { MetaCredentialService } from "../credentials/credential.service";
 import { FindManyAdSetDto } from "./dto/find-many.dto";
@@ -9,6 +9,7 @@ import { UpdateAdSetDto } from "./dto/update-adset.dto";
 import { FindManyTargetingOptionsDto } from "./dto/find-many-target.dto";
 import { Interest } from "./types";
 import { UserSession } from "@thallesp/nestjs-better-auth";
+import { FindManyAdSetsInsightsDto } from "./dto/find-many-adset-insights.dto";
 
 @Injectable()
 export class AdSetService {
@@ -90,6 +91,51 @@ export class AdSetService {
             data
         };
     }
+
+   async getInsights(id: string, query: FindManyAdSetsInsightsDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
+        const api = new FacebookAdsApi(token);
+        const adset = new AdSet(id, {}, null, api);
+
+        const fields = [
+            AdsInsights.Fields.spend,
+            AdsInsights.Fields.adset_id,
+            AdsInsights.Fields.adset_name,
+            AdsInsights.Fields.impressions,
+            AdsInsights.Fields.cpc,
+            AdsInsights.Fields.cpm,
+            AdsInsights.Fields.cpp,
+            AdsInsights.Fields.ctr,
+            AdsInsights.Fields.unique_ctr,
+            AdsInsights.Fields.unique_clicks,
+            AdsInsights.Fields.cost_per_unique_click,
+            AdsInsights.Fields.cost_per_unique_conversion,
+            AdsInsights.Fields.cost_per_result,
+            AdsInsights.Fields.reach,
+            AdsInsights.Fields.results,
+        ];
+        const params = {
+            level: 'adset',
+            date_preset: query.date_preset,
+        };
+
+        const insights = await adset.getInsights(fields, params);
+        const data = insights.map(c => c.exportData());
+        const hasNext = insights.hasNext();
+        const hasPrev = insights.hasPrevious();
+        const paging_cursors = {
+            before: (hasPrev ? insights.paging.cursors.before : null),
+            after: (hasNext ? insights.paging.cursors.after : null)
+        }
+
+        return { 
+            data,
+            paging_cursors
+        }
+    }
+
+
+
 
     async create(payload: CreateAdSetDto, query: QueryAdSetDto, session: UserSession) {
         const token = await this.creds.getToken(session);

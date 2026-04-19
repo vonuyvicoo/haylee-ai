@@ -5,7 +5,7 @@ import { IRole } from './../../message/dto/create-message.dto'
 
 export const CreateMessageDtoSchema = z.object({
   message: z.string(),
-  conversation_history: z.unknown().optional(),
+  conversation_id: z.string().optional(),
 })
 
 export const IHistoryPayloadSchema = z.object({

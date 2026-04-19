@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { MetaCredentialService } from "../credentials/credential.service";
-import { AdAccount, Campaign, FacebookAdsApi } from "facebook-nodejs-business-sdk";
+import { AdAccount, AdsInsights, Campaign, FacebookAdsApi } from "facebook-nodejs-business-sdk";
 import { BudgetStrategy } from "./dto/create-campaign.dto";
 import { FindManyCampaignDto } from "./dto/find-many.dto";
 import { CreateCampaignDto, QueryCampaignDto } from "./dto/create-campaign.dto";
 import { UpdateCampaignDto } from "./dto/update-campaign.dto";
 import { UserSession } from "@thallesp/nestjs-better-auth";
+import { FindManyCampaignInsightsDto } from "./dto/find-many-campaign-insights.dto";
 
 @Injectable()
 export class CampaignService {
@@ -65,6 +66,48 @@ export class CampaignService {
         return {
             data
         };
+    }
+
+   async getInsights(id: string, query: FindManyCampaignInsightsDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
+        const api = new FacebookAdsApi(token);
+        const campaign = new Campaign(id, {}, null, api);
+
+        const fields = [
+            AdsInsights.Fields.spend,
+            AdsInsights.Fields.campaign_id,
+            AdsInsights.Fields.campaign_name,
+            AdsInsights.Fields.impressions,
+            AdsInsights.Fields.cpc,
+            AdsInsights.Fields.cpm,
+            AdsInsights.Fields.cpp,
+            AdsInsights.Fields.ctr,
+            AdsInsights.Fields.unique_ctr,
+            AdsInsights.Fields.unique_clicks,
+            AdsInsights.Fields.cost_per_unique_click,
+            AdsInsights.Fields.cost_per_unique_conversion,
+            AdsInsights.Fields.cost_per_result,
+            AdsInsights.Fields.reach,
+            AdsInsights.Fields.results,
+        ];
+        const params = {
+            level: 'campaign',
+            date_preset: query.date_preset,
+        };
+
+        const insights = await campaign.getInsights(fields, params);
+        const data = insights.map(c => c.exportData());
+        const hasNext = insights.hasNext();
+        const hasPrev = insights.hasPrevious();
+        const paging_cursors = {
+            before: (hasPrev ? insights.paging.cursors.before : null),
+            after: (hasNext ? insights.paging.cursors.after : null)
+        }
+
+        return { 
+            data,
+            paging_cursors
+        }
     }
 
 
