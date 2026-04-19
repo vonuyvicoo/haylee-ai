@@ -19,3 +19,11 @@ Above documentations are crucial for the system to work.
 
 --
 
+# Using the Ad Library
+
+Per upstream requirements, you can't use the Ad Library capability if your account hasn't been verified to run ads of special categories.
+
+Please read here for more info: [Ad Library API](https://www.facebook.com/ads/library/api/?source=onboarding)
+
+You can get verified here: [Facebook ID](https://facebook.com/ID)
+

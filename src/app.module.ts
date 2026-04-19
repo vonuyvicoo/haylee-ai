@@ -21,6 +21,7 @@ import { FacebookRequestErrorFilter } from './_shared/filters/facebook.filter';
 import { ConfigModule } from "@nestjs/config";
 import * as Joi from "joi";
 import { CSRFGuard } from './_shared/guards/csrf.guard';
+import { AdLibraryModule } from './meta/adlibrary/adlibrary.module';
 
 const ErrorProvider: Provider = {
     provide: APP_FILTER,
@@ -48,6 +49,7 @@ const CsrfGuardProvider: Provider = {
                 DOMAIN: Joi.string(),
             })
         }),
+        AdLibraryModule,
         UserModule,
         PrismaModule,
         EventEmitterModule.forRoot(),
