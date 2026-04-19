@@ -29,21 +29,7 @@ export class AgentService implements OnModuleInit {
     constructor(
         @Inject(HAYLEE_TOOL_TOKEN) private readonly tools: HayleeTool[],
         @Inject(MAIN_LLM_TOKEN) private readonly model: BaseChatModel
-    ) {
-        const agentTools = this.createDirectTools();
-        this.logger.log(`Loaded ${agentTools.length} tools`)
-        
-        this.agent = createAgent({
-            model: this.model,
-            tools: [...agentTools],
-            systemPrompt: MAIN_PROMPT,
-            middleware: [
-                handleToolErrors
-            ],
-            checkpointer: this.checkpointer
-        });
-
-    }
+    ) {}
 
     async onModuleInit() {
         const dbUrl = process.env.DATABASE_URL;
@@ -54,6 +40,20 @@ export class AgentService implements OnModuleInit {
         } else {
             this.logger.log(`Skipping checkpointer setup. INIT_CHECKPOINTER is set to false`)
         }
+
+        const agentTools = this.createDirectTools();
+        this.logger.log(`Loaded ${agentTools.length} tools`)
+
+        this.agent = createAgent({
+            model: this.model,
+            tools: [...agentTools],
+            systemPrompt: MAIN_PROMPT,
+            middleware: [
+                handleToolErrors
+            ],
+            checkpointer: this.checkpointer
+        });
+
     }
 
     private async setupCheckpointer() {
@@ -73,6 +73,7 @@ export class AgentService implements OnModuleInit {
     }
 
     async *invoke(thread_id: string, message: string, session: UserSession, signal: AbortSignal) {
+        console.log("THREAD ID: ", thread_id);
         try {
             for await (const [mode, chunk] of await this.agent.stream(
                 { messages: new HumanMessage(message) }, 

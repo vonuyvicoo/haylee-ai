@@ -6,6 +6,7 @@ import { UpdateAdSetDto } from "./dto/update-adset.dto";
 import { FindManyTargetingOptionsDto } from "./dto/find-many-target.dto";
 import { FindManyBaseDto } from "../dto/find-many-base.dto";
 import { Session, UserSession } from "@thallesp/nestjs-better-auth";
+import { FindManyAdSetsInsightsDto } from "./dto/find-many-adset-insights.dto";
 
 @Controller('meta/ad-sets')
 export class AdSetController {
@@ -35,6 +36,8 @@ export class AdSetController {
         return data;
     }
 
+
+
     @Get(":adset_id")
     async findOne(
         @Session() session: UserSession,
@@ -42,6 +45,16 @@ export class AdSetController {
     ) {
         const data = await this.adsetsService.findOne(adset_id, session);
         return data;
+    }
+
+   @Get(":adset_id/insights")
+    async getInsights(
+        @Param("adset_id") adset_id: string,
+        @Session() session: UserSession,
+        @Query() query: FindManyAdSetsInsightsDto 
+    ) {
+        const adset = await this.adsetsService.getInsights(adset_id, query, session);
+        return adset;
     }
 
     @Post()

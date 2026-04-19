@@ -1,9 +1,10 @@
 import { Injectable } from "@nestjs/common";
 import { MetaCredentialService } from "../credentials/credential.service";
 import { FindManyAdsDto } from "./dto/find-many.dto";
-import { Ad, AdAccount, FacebookAdsApi } from "facebook-nodejs-business-sdk";
+import { Ad, AdAccount, AdsInsights, FacebookAdsApi } from "facebook-nodejs-business-sdk";
 import { CreateAdDto, QueryAdDto, UpdateAdDto } from "./dto/create-ad.dto";
 import { UserSession } from "@thallesp/nestjs-better-auth";
+import { FindManyAdInsightsDto } from "./dto/find-many-ad-insights.dto";
 
 @Injectable()
 export class AdService {
@@ -50,6 +51,49 @@ export class AdService {
 
         return { data, paging_cursors };
     }
+
+    async getInsights(id: string, query: FindManyAdInsightsDto, session: UserSession) {
+        const token = await this.creds.getToken(session);
+        const api = new FacebookAdsApi(token);
+        const ad = new Ad(id, {}, null, api);
+
+        const fields = [
+            AdsInsights.Fields.spend,
+            AdsInsights.Fields.ad_id,
+            AdsInsights.Fields.ad_name,
+            AdsInsights.Fields.impressions,
+            AdsInsights.Fields.cpc,
+            AdsInsights.Fields.cpm,
+            AdsInsights.Fields.cpp,
+            AdsInsights.Fields.ctr,
+            AdsInsights.Fields.unique_ctr,
+            AdsInsights.Fields.unique_clicks,
+            AdsInsights.Fields.cost_per_unique_click,
+            AdsInsights.Fields.cost_per_unique_conversion,
+            AdsInsights.Fields.cost_per_result,
+            AdsInsights.Fields.reach,
+            AdsInsights.Fields.results,
+        ];
+        const params = {
+            level: 'ad',
+            date_preset: query.date_preset,
+        };
+
+        const insights = await ad.getInsights(fields, params);
+        const data = insights.map(c => c.exportData());
+        const hasNext = insights.hasNext();
+        const hasPrev = insights.hasPrevious();
+        const paging_cursors = {
+            before: (hasPrev ? insights.paging.cursors.before : null),
+            after: (hasNext ? insights.paging.cursors.after : null)
+        }
+
+        return { 
+            data,
+            paging_cursors
+        }
+    }
+
 
     async create(payload: CreateAdDto, query: QueryAdDto, session: UserSession) {
         const token = await this.creds.getToken(session);

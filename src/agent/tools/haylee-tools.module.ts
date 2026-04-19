@@ -10,6 +10,7 @@ import { FilesModule } from "src/files/files.module"
 import { ImageGeneratorModule } from "src/image-generator/image-generator.module"
 import { LlmModule } from "src/llm/llm.module"
 import { HayleeSubagentsModule } from "../subagents/haylee-subagents.module"
+import { GetAdInsightsTool, GetAdSetInsightsTool, GetCampaignInsightsTool } from "./implementation"
 
 const ToolClasses = [
     CreateAdTool,
@@ -20,7 +21,10 @@ const ToolClasses = [
     FindManyCampaignsTool,
     SearchInterestsTool,
     UploadMediaLibraryToMetaTool,
-    LaunchResearcherSubagentTool
+    LaunchResearcherSubagentTool,
+    GetAdInsightsTool,
+    GetAdSetInsightsTool,
+    GetCampaignInsightsTool
 ]
 
 const HayleeToolProvider: Provider = {
