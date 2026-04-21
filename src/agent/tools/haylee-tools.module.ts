@@ -1,7 +1,7 @@
 import { Module, Provider } from "@nestjs/common"
 import { CreateAdCreativeTool, CreateAdSetTool, CreateAdTool, CreateCampaignTool, CreateImageTool, FindManyCampaignsTool, LaunchResearcherSubagentTool, SearchInterestsTool, UploadMediaLibraryToMetaTool } from "./implementation"
 import { HAYLEE_TOOL_TOKEN } from "src/_shared/constants"
-import { HayleeTool } from "./base"
+import { HayleeTool } from "../common";
 import { CampaignModule } from "src/meta/campaign/campaign.module"
 import { AdSetModule } from "src/meta/adset/adset.module"
 import { AdModule } from "src/meta/ads/ads.module"

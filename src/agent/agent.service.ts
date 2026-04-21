@@ -7,7 +7,7 @@ import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 import { RunnableConfig } from '@langchain/core/runnables';
 import { BaseChatModel } from '@langchain/core/language_models/chat_models';
 import { HAYLEE_TOOL_TOKEN, MAIN_LLM_TOKEN } from 'src/_shared/constants';
-import { HayleeTool } from './tools/base';
+import { HayleeTool } from './common';
 import { handleToolErrors } from './middleware/tool-error.middleware';
 
 export const BANNED_WORDS = [

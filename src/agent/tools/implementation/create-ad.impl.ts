@@ -1,5 +1,5 @@
 import { StructuredTool, tool } from "langchain";
-import { HayleeTool } from "../base";
+import { HayleeTool } from "../../common";
 import { RunnableConfig } from "@langchain/core/runnables";
 import z from "zod";
 import { AdService } from "src/meta/ads/ads.service";

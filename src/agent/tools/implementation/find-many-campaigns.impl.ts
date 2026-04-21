@@ -1,5 +1,5 @@
 import { StructuredTool, tool } from "langchain";
-import { HayleeTool } from "../base";
+import { HayleeTool } from "../../common";
 import { CampaignService } from "src/meta/campaign/campaign.service";
 import { FindManyCampaignDto } from "src/meta/campaign/dto/find-many.dto";
 import { FindManyCampaignDtoSchema } from "src/generated/schemas/find-many.dto.schema";

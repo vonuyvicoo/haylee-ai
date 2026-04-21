@@ -1,5 +1,5 @@
 import { StructuredTool, tool } from "langchain";
-import { HayleeTool } from "../base";
+import { HayleeTool } from "../../common";
 import { RunnableConfig } from "@langchain/core/runnables";
 import z from "zod";
 import { FindManyTargetingOptionsDtoSchema } from "src/generated/schemas/find-many-target.dto.schema";

@@ -1,5 +1,5 @@
 import { StructuredTool, tool } from "langchain";
-import { HayleeTool } from "../base";
+import { HayleeTool } from "../../common";
 import { CampaignService } from "src/meta/campaign/campaign.service";
 import { RunnableConfig } from "@langchain/core/runnables";
 import { CreateCampaignDtoSchema, QueryCampaignDtoSchema } from "src/generated/schemas/create-campaign.dto.schema";
