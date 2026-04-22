@@ -5,13 +5,16 @@
  * Outputs one *.schema.ts file per DTO file into src/generated/schemas/
  */
 
-import { Project, ClassDeclaration, PropertyDeclaration, Decorator, SourceFile, SyntaxKind, Node } from 'ts-morph'
+import { Project, ClassDeclaration, PropertyDeclaration, Decorator, SyntaxKind, Node } from 'ts-morph'
 import * as path from 'path'
 import * as fs from 'fs'
 
 const API_ROOT = path.resolve(__dirname, '..')
-const API_SRC  = path.join(API_ROOT, 'src')
-const OUT_DIR  = path.join(API_SRC, 'generated', 'schemas')
+const API_SRC  = path.join(API_ROOT, 'src', 'modules')
+const OUT_DIR  = path.join(API_ROOT, 'src', 'common', 'generated', 'schemas')
+
+const tsconfig = JSON.parse(fs.readFileSync(path.join(API_ROOT, 'tsconfig.json'), 'utf8').replace(/\/\/.*/g, ''))
+const tsPaths: Record<string, string[]> = tsconfig.compilerOptions?.paths ?? {}
 
 fs.mkdirSync(OUT_DIR, { recursive: true })
 
@@ -37,13 +40,20 @@ for (const sourceFile of project.getSourceFiles()) {
   for (const imp of sourceFile.getImportDeclarations()) {
     const spec = imp.getModuleSpecifierValue()
 
-    // Resolve the import: relative paths OR baseUrl-rooted paths (e.g. "src/meta/...")
+    // Resolve the import: relative paths, aliases (@common/*, @core/*, @modules/*), or baseUrl-rooted paths
     const dir = path.dirname(sourceFile.getFilePath())
+    const resolved = resolveAlias(spec)
     const candidates = spec.startsWith('.')
       ? [
           path.resolve(dir, spec + '.ts'),
           path.resolve(dir, spec),
           path.resolve(dir, spec + '/index.ts'),
+        ]
+      : resolved
+      ? [
+          resolved + '.ts',
+          resolved,
+          resolved + '/index.ts',
         ]
       : [
           path.resolve(API_ROOT, spec + '.ts'),
@@ -349,4 +359,15 @@ function maybeOptOrDefault(expr: string, optional: boolean, initializer?: string
   if (optional && initializer) return `${expr}.default(${initializer})`
   if (optional) return `${expr}.optional()`
   return expr
+}
+
+function resolveAlias(spec: string): string | null {
+  for (const [pattern, targets] of Object.entries(tsPaths)) {
+    const prefix = pattern.replace(/\/\*$/, '')
+    if (spec === prefix || spec.startsWith(prefix + '/')) {
+      const target = targets[0].replace(/\/\*$/, '')
+      return path.join(API_ROOT, target, spec.slice(prefix.length))
+    }
+  }
+  return null
 }

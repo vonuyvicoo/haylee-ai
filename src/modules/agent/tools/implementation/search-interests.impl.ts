@@ -1,0 +1,32 @@
+import { StructuredTool, tool } from "langchain";
+import { RunnableConfig } from "@langchain/core/runnables";
+import z from "zod";
+import { Injectable } from "@nestjs/common";
+import { FindManyTargetingOptionsDtoSchema } from "@common/generated/schemas/find-many-target.dto.schema";
+import { AdSetService } from "@modules/meta/adset/adset.service";
+import { HayleeTool } from "@modules/agent/common";
+
+export type SearchInterestsDto = z.infer<typeof FindManyTargetingOptionsDtoSchema>;
+
+@Injectable()
+export class SearchInterestsTool extends HayleeTool {
+    constructor(private adSetService: AdSetService){
+        super();
+    }
+    getStructuredTool(): StructuredTool {
+        
+        return tool(
+            async (params: SearchInterestsDto, config: RunnableConfig) => {
+                const result = await this.adSetService.searchTargets(params, config.configurable?.session);
+                return JSON.stringify(result);
+            },
+            {
+                name: 'search_interests',
+                description: "Search Meta insterest. REQUIRED for creating adsets",
+                schema: FindManyTargetingOptionsDtoSchema
+            }
+        );
+    }
+} 
+
+
