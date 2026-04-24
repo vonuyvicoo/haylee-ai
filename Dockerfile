@@ -20,7 +20,7 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN pnpm build
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" pnpm build
 
 
 FROM node:20-slim AS production
