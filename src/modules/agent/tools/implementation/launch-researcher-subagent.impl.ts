@@ -22,7 +22,7 @@ export class LaunchResearcherSubagentTool extends HayleeTool {
         return tool(
             async (params: LaunchResearchSubagentParams) => {
                 const subagent: IRunnableSubagent<ResearchSubAgentParams> = this.subagents.SEARCH;
-                await subagent.run({
+                return await subagent.run({
                     params: {
                         task: params.task
                     }

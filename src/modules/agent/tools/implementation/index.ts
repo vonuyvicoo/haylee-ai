@@ -10,3 +10,4 @@ export * from "./launch-researcher-subagent.impl";
 export * from "./get-ad-insights.impl";
 export * from "./get-adset-insights.impl";
 export * from "./get-campaign.insights.impl";
+export * from "./send-email.impl";

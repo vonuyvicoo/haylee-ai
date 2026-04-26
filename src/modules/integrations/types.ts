@@ -5,6 +5,7 @@ export enum CredentialType {
 
 export enum IntegrationType {
     META = "META"
+    //GMAIL 
 }
 
 export type OAuthToken = {

@@ -11,7 +11,7 @@ export enum RunnableSubagentType {
 
 export interface IRunnableSubagent<T> {
     name: RunnableSubagentType;
-    run(params: RunnableInvocationParams<T>): Promise<void>;
+    run(params: RunnableInvocationParams<T>): Promise<string>;
 }
 
 export type SubagentMap = Record<RunnableSubagentType, IRunnableSubagent<unknown>>;
