@@ -1,5 +1,5 @@
 import { Module, Provider } from "@nestjs/common"
-import { CreateAdCreativeTool, CreateAdSetTool, CreateAdTool, CreateCampaignTool, CreateImageTool, FindManyCampaignsTool, GetAdInsightsTool, GetAdSetInsightsTool, GetCampaignInsightsTool, LaunchResearcherSubagentTool, SearchInterestsTool, UploadMediaLibraryToMetaTool } from "./implementation"
+import { CreateAdCreativeTool, CreateAdSetTool, CreateAdTool, CreateCampaignTool, CreateImageTool, FindManyCampaignsTool, GetAdInsightsTool, GetAdSetInsightsTool, GetCampaignInsightsTool, LaunchResearcherSubagentTool, SearchInterestsTool, SendEmailTool, UploadMediaLibraryToMetaTool } from "./implementation"
 import { HAYLEE_TOOL_TOKEN } from "@common/constants"
 import { HayleeTool } from "../common"
 import { CampaignModule } from "@modules/meta/campaign/campaign.module"
@@ -10,6 +10,7 @@ import { FilesModule } from "@modules/files/files.module"
 import { ImageGeneratorModule } from "@core/image-generator/image-generator.module"
 import { LlmModule } from "@core/llm/llm.module"
 import { HayleeSubagentsModule } from "../subagents/haylee-subagents.module"
+import { EmailModule } from "@modules/email/email.module"
 
 const ToolClasses = [
     CreateAdTool,
@@ -23,7 +24,8 @@ const ToolClasses = [
     LaunchResearcherSubagentTool,
     GetAdInsightsTool,
     GetAdSetInsightsTool,
-    GetCampaignInsightsTool
+    GetCampaignInsightsTool,
+    SendEmailTool
 ]
 
 const HayleeToolProvider: Provider = {
@@ -36,7 +38,8 @@ const HayleeToolProvider: Provider = {
     imports: [
         CampaignModule, AdSetModule, AdModule, 
         AdCreativeModule, FilesModule, ImageGeneratorModule, 
-        LlmModule, HayleeSubagentsModule
+        LlmModule, HayleeSubagentsModule,
+        EmailModule
     ],
     providers: [...ToolClasses, HayleeToolProvider],
     exports: [HAYLEE_TOOL_TOKEN]

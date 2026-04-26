@@ -22,6 +22,7 @@ import { AdCreativeModule } from '@modules/meta/ad-creative/adcreative.module';
 import { MessageModule } from '@modules/message/message.module';
 import { ImageGeneratorModule } from '@core/image-generator/image-generator.module';
 import { FilesModule } from '@modules/files/files.module';
+import { EmailModule } from '@modules/email/email.module';
 
 const ErrorProvider: Provider = {
     provide: APP_FILTER,
@@ -61,7 +62,7 @@ const CsrfGuardProvider: Provider = {
         AdCreativeModule,
         MessageModule,
         ImageGeneratorModule,
-        FilesModule
+        FilesModule,
     ],
   controllers: [AppController],
   providers: [AppService, ErrorProvider, FacebookErrorProvider, CsrfGuardProvider],

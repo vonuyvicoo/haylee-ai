@@ -1,37 +1,35 @@
 import { StructuredTool, tool } from "langchain";
-import { HayleeTool } from "../../../common";
 import { RunnableConfig } from "@langchain/core/runnables";
 import z from "zod";
 import { Injectable } from "@nestjs/common";
+import { SearchService } from "@common/utils/search/search.service";
+import { HayleeTool } from "@modules/agent/common";
 
 export const SearchWebSchema = z.object({
     query: z.string()
 });
 
 export type SearchWebParams = z.infer<typeof SearchWebSchema>;
-/*
+
 @Injectable()
 export class SearchWebTool extends HayleeTool {
-    constructor(){
+    constructor(private readonly searchService: SearchService){
         super();
     }
 
     getStructuredTool(): StructuredTool {
-        
         return tool(
             async (params: SearchWebParams, config: RunnableConfig) => {
-                const { ad_id, ...rest } = params;
-                const result = await this.metaAdService.getInsights(params.ad_id, rest, config.configurable?.session);
+                const result = await this.searchService.search(params.query);
                 return JSON.stringify(result);
             },
             {
-                name: 'get_ad_insights',
-                description: "Used to get META ad insights",
-                schema: GetManyAdInsightsDtoSchema 
+                name: 'search_web',
+                description: "Used to search web",
+                schema: SearchWebSchema 
             }
         );
     }
 } 
 
 
-*/

@@ -4,8 +4,12 @@ export function serializeToolError(error: unknown): string {
     if (!(error instanceof Error)) return String(error);
     const parts: string[] = [error.message];
     const e = error as unknown as Record<string, unknown>;
-    if (e['response'] != null) {
-        parts.push(JSON.stringify(e['response'], null, 2));
+    const response = e['response'] as Record<string, unknown> | null | undefined;
+    if (response != null) {
+        parts.push(JSON.stringify({
+            status: response['status'],
+            data: response['data'],
+        }));
     }
     return parts.join('\n');
 }

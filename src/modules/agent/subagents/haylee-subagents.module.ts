@@ -3,6 +3,7 @@ import { ResearchSubAgent, } from "./researcher.subagent";
 import { IRunnableSubagent, SubagentMap } from "./interface";
 import { HAYLEE_SUBAGENT_TOKEN } from "@common/constants";
 import { LlmModule } from "@core/llm/llm.module";
+import { HayleeSubagentToolsModule } from "./tools/subagent-tools.module";
 
 const AgentClasses = [
     ResearchSubAgent
@@ -17,14 +18,12 @@ export const HayleeSubAgentFactory = function(...args: IRunnableSubagent<unknown
 
 export const HayleeSubagentProvider: Provider = {
     provide: HAYLEE_SUBAGENT_TOKEN,
-    useFactory: function(...args: IRunnableSubagent<unknown>[]) {
-        return args
-    },
-    inject: AgentClasses 
+    useFactory: HayleeSubAgentFactory,
+    inject: AgentClasses
 }
 
 @Module({
-    imports: [LlmModule],
+    imports: [LlmModule, HayleeSubagentToolsModule],
     providers: [
         ...AgentClasses,
         HayleeSubagentProvider

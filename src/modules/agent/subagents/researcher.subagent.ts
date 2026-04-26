@@ -3,7 +3,9 @@ import { IRunnableSubagent, RunnableInvocationParams, RunnableSubagentType } fro
 import z from "zod";
 import { BaseChatModel } from "@langchain/core/language_models/chat_models";
 import { Inject, Injectable } from "@nestjs/common";
-import { MAIN_LLM_TOKEN } from "@common/constants";
+import { HAYLEE_SUBAGENT_TOOL_TOKEN, MAIN_LLM_TOKEN } from "@common/constants";
+import { HayleeTool } from "../common";
+import { handleToolErrors } from "../middleware/tool-error.middleware";
 
 export const ResearchSubAgentSchema = z.object({
     task: z.string().describe("Detailed task instructions for the subagent.")
@@ -17,20 +19,34 @@ export class ResearchSubAgent implements IRunnableSubagent<ResearchSubAgentParam
     public name = RunnableSubagentType.SEARCH;
 
     constructor(
-        @Inject(MAIN_LLM_TOKEN) private readonly model: BaseChatModel
-    ){
-        this.agent = createAgent({
-            model: this.model,
-            systemPrompt: "You are a researcher subagent",
-        })
-    }
+        @Inject(MAIN_LLM_TOKEN) private readonly model: BaseChatModel,
+        @Inject(HAYLEE_SUBAGENT_TOOL_TOKEN) private readonly tools: HayleeTool[],
+    ){}
 
-    async run(options: RunnableInvocationParams<ResearchSubAgentParams>): Promise<void> {
-        await this.agent.invoke({
-            messages: [new HumanMessage(options.params.task)]
+    async onModuleInit() {
+        const agentTools = Object.keys(this.tools).map((key) => {
+            return this.tools[key].getStructuredTool();
         });
 
-        return;
-        //langchain handles the stream and output
-    } 
+        this.agent = createAgent({
+            model: this.model,
+            tools: [...agentTools],
+            systemPrompt: "You are a researcher subagent",
+            middleware: [
+                handleToolErrors
+            ],
+        });
+
+    }
+
+    async run(options: RunnableInvocationParams<ResearchSubAgentParams>): Promise<string> {
+        const result = await this.agent.invoke({
+            messages: [new HumanMessage(options.params.task)],
+            ...options.config,
+        });
+
+        const messages: any[] = result.messages ?? [];
+        const last = [...messages].reverse().find(m => m._getType?.() === 'ai' || m.constructor?.name === 'AIMessage');
+        return last?.content ?? 'Research complete. No summary available.';
+    }
 }
